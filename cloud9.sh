@@ -9,45 +9,48 @@ function _logger() {
     echo -e "$(date) ${YELLOW}[*] $@ ${NC}"
 }
 
+## echo "This script support Amazon Linux 2 ONLY !!!"
+
 KERNEL_TYPE=linux
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    echo "Linux OS"
-    DISTRO_ID=$(lsb_release -si)
-    if [[ "$DISTRO_ID" == "Ubuntu" ]]; then
-        echo "Install with apt"
-        sudo apt-get install -y apache2-utils jq gettext bash-completion
-    elif [[ "$DISTRO_ID" == "AmazonLinux"* ]]; then
-        echo "Install with yum"
-        sudo yum install -y jq gettext bash-completion
-    else
-        echo "error can't install package"
-        exit 1;
-    fi
-elif [[ "$OSTYPE" == "darwin"* ]]; then
-    brew install jq wget
-    KERNEL_TYPE=darwin
-else
-    echo "Unsupport platform: $OSTYPE"
-    exit 1
-fi
+sudo yum install -y jq gettext bash-completion
+# if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+#     echo "Linux OS"
+#     DISTRO_ID=$(lsb_release -si)
+#     if [[ "$DISTRO_ID" == "Ubuntu" ]]; then
+#         echo "Install with apt"
+#         sudo apt-get install -y apache2-utils jq gettext bash-completion
+#     elif [[ "$DISTRO_ID" == "AmazonLinux"* ]]; then
+#         echo "Install with yum"
+#         sudo yum install -y jq gettext bash-completion
+#     else
+#         echo "error can't install package"
+#         exit 1;
+#     fi
+# elif [[ "$OSTYPE" == "darwin"* ]]; then
+#     brew install jq wget
+#     KERNEL_TYPE=darwin
+# else
+#     echo "Unsupport platform: $OSTYPE"
+#     exit 1
+# fi
 
 echo "#########################################################"
 _logger "[+] 1. Installing latest AWS CLI - version 2"
 echo "#########################################################"
-if [[ "$KERNEL_TYPE" == "linux" ]]; then
+# if [[ "$KERNEL_TYPE" == "linux" ]]; then
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
     unzip awscliv2.zip
     sudo ./aws/install --update
     rm -rf awscliv2.zip aws
     curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
     sudo mv /tmp/eksctl /usr/local/bin
-else
-    curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
-    sudo installer -pkg ./AWSCLIV2.pkg -target /
-    rm -rf aws AWSCLIV2.pkg
-    brew tap weaveworks/tap
-    brew install weaveworks/tap/eksctl
-fi
+# else
+#     curl "https://awscli.amazonaws.com/AWSCLIV2.pkg" -o "AWSCLIV2.pkg"
+#     sudo installer -pkg ./AWSCLIV2.pkg -target /
+#     rm -rf aws AWSCLIV2.pkg
+#     brew tap weaveworks/tap
+#     brew install weaveworks/tap/eksctl
+# fi
 
 echo "#########################################################"
 _logger "[+] 2. Installing k9s"
@@ -90,3 +93,15 @@ sudo mv terraform /usr/local/bin/
 echo "Terraform $version installed."
 rm "terraform_amd64.zip"
 echo "Install terraform*.zip file cleaned up."
+
+echo "[x] Verify Git client": $(git --version)
+echo "[x] Verify AWS CLI version 2": $(aws --version)
+# echo "[x] Verify Node.js": $(node --version)
+# echo "[x] Verify CDK": $(cdk --version)
+# echo "[x] Verify Python": $(python -V)
+# echo "[x] Verify Python3": $(python3 -V)
+# echo "[x] Verify Pip3": $(pip3 -V)
+echo "[x] Verify kubectl": $(kubectl version --client)
+# echo "[x] Verify eksctl": $(eksctl version)
+echo "[x] Verify helm3": $(helm version --short)
+echo "[x] Verify k9s": $(k9s version --short)
