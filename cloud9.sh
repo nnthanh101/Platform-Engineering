@@ -133,6 +133,11 @@ echo "Install terraform*.zip file cleaned up."
 #     exit 1
 # fi
 
+## FIXME5
+## [K8sLens](https://k8slens.dev/)
+## [TFSec](https://github.com/tfsec/tfsec)
+## [Checkov](https://pypi.org/project/checkov/)
+
 _logger "[+] Verify Prerequisites ..."
 echo "[x] Verify Git client":        $(git --version)
 echo "[x] Verify jq":                $(jq   --version)

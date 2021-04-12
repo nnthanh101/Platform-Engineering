@@ -1,6 +1,6 @@
 This guide describes the architecture and implementation of production-ready **Amazon EKS (Elastic Kubernetes Service)** using **Hashicorp Terraform** in multiple *AWS accounts* with a unique *Terraform state*, including 
 
-* [x] 1. AWS Infrastructure
+* [x] 1. **AWS Infrastructure**
     * [x] 1.1. New **Amazon Virtual Public Cloud** (**VPC**) or specified **Amazon VPC** in same or different **AWS accounts**.
         * [x] 1.1.1. Standard VPC:
         * [ ] 1.1.2. Private VPC:
@@ -14,6 +14,7 @@ This guide describes the architecture and implementation of production-ready **A
     * [x] 1.3. VPC-Peering
     * [x] 1.4. EFS 
     * [ ] 1.5. [RBAC for Devlopers and Administrators](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html): predefined roles and attach corresponding policies with the roles.
+    * [ ] 1.6. [AWS EC2 Image Builder Pipeline](https://aws.amazon.com/image-builder/)
 * [ ] 2. Provisioning **Amazon EKS cluster**: uses configurable **Terraform modules** with related AWS resources spanned across multiple **AWS accounts**.
     * [ ] [Amazon EKS cluster endpoint access control](https://docs.aws.amazon.com/eks/latest/userguide/cluster-endpoint.html#modify-endpoint-access)
         * [ ] Public Amazon EKS cluster exposes public endpoints of other required services  for communication.  

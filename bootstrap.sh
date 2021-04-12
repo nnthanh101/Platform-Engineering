@@ -96,6 +96,19 @@ cd  ${WORKING_DIR}/terraform/stacks/vpc &&           \
 #     terraform apply -input=false -auto-approve ${PROJECT_ID}.efs.tfplan
 
 
+## FIXME4 EC2-Image-Builder
+# echo
+# echo "#########################################################"
+# _logger "[+] 1.6. AWS EC2 Image Builder Pipeline: teraform/stacks/ec2-image-builder/terraform.tfvars"
+# echo "#########################################################"
+# echo
+
+# cd  ${WORKING_DIR}/terraform/stacks/ec2-image-builder &&           \
+#     terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-ec2-image-builder-stack.tfstate"
+#     terraform plan -out ${PROJECT_ID}.ec2-image-builder.tfplan &&  \
+#     terraform apply -input=false -auto-approve ${PROJECT_ID}.ec2-image-builder.tfplan
+
+
 ended_time=$(date '+%d/%m/%Y %H:%M:%S')
 echo
 echo "#########################################################"
