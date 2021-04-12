@@ -30,7 +30,7 @@ echo
 ## Create S3 Bucket with Versioning Enabled to store Terraform State
 echo
 echo "#########################################################"
-_logger "[+] 1. Creating S3 Bucket with Versioning Enabled to store Terraform State."
+_logger "[+] Creating S3 Bucket with Versioning Enabled to store Terraform State."
 echo "#########################################################"
 echo
 # aws sts get-caller-identity
@@ -45,10 +45,10 @@ aws s3api put-bucket-versioning --bucket ${TF_STATE_S3_BUCKET} --versioning-conf
 
 echo
 echo "#########################################################"
-_logger "[+] 2. [Networking] Provisioning Modern-VPC Stack: teraform/stacks/vpc/terraform.tfvars"
-_logger "2.1. Standard VPC >> "
-echo "2.2. Private  VPC >> "
-echo "2.3. Advanced VPC >> "
+_logger "[+] 1.1. [AWS-Infra] Provisioning Modern-VPC Stack: teraform/stacks/vpc/terraform.tfvars"
+_logger "1.1.1. Standard VPC >> "
+echo    "1.1.2. Private  VPC >> "
+echo    "1.1.3. Advanced VPC >> "
 echo "#########################################################"
 echo
 
@@ -56,10 +56,45 @@ echo
 # read -p "[Modern-VPC] Press key to continue.. " -n1 -s
 # sleep 15
 
-cd ${WORKING_DIR}/terraform/stacks/vpc && \
-terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-vpc-stack.tfstate" && \
-terraform plan -out ${PROJECT_ID}.vpc.tfplan && \
-terraform apply -input=false -auto-approve ${PROJECT_ID}.vpc.tfplan
+cd  ${WORKING_DIR}/terraform/stacks/vpc &&           \
+    terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-vpc-stack.tfstate" && \
+    terraform plan -out ${PROJECT_ID}.vpc.tfplan &&  \
+    terraform apply -input=false -auto-approve ${PROJECT_ID}.vpc.tfplan
+
+## FIXME3 VPC-Endpoints
+# echo
+# echo "#########################################################"
+# _logger "[+] 1.2. VPC Interface/Gateway Endpoints: teraform/stacks/XXX/terraform.tfvars"
+# echo "#########################################################"
+# echo
+
+## FIXME2 VPC-Peering
+# echo
+# echo "#########################################################"
+# _logger "[+] 1.3. VPC Peering: teraform/stacks/vpc-peering/terraform.tfvars"
+# echo " [DevTest]      AWS-Account1-VPC1: CI/CD Pipeline - Code*, Jenkins, GitLab
+# echo " [Staging/Prod] AWS-Account2-VPC2: EKS Cluster Staging/Prod
+# echo "#########################################################"
+# echo
+
+# cd  ${WORKING_DIR}/terraform/stacks/vpc-peering &&           \
+#     terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-vpc-peering-stack.tfstate"
+#     terraform plan -out ${PROJECT_ID}.vpc-peering.tfplan &&  \
+#     terraform apply -input=false -auto-approve ${PROJECT_ID}.vpc-peering.tfplan
+
+
+## FIXME1 EFS
+# echo
+# echo "#########################################################"
+# _logger "[+] 1.4. Provisioning EFS Stack: teraform/stacks/efs/terraform.tfvars"
+# echo "#########################################################"
+# echo
+
+# cd  ${WORKING_DIR}/terraform/stacks/efs &&           \
+#     terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-efs-stack.tfstate"
+#     terraform plan -out ${PROJECT_ID}.efs.tfplan &&  \
+#     terraform apply -input=false -auto-approve ${PROJECT_ID}.efs.tfplan
+
 
 ended_time=$(date '+%d/%m/%Y %H:%M:%S')
 echo

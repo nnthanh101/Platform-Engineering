@@ -148,7 +148,7 @@ echo "[x] Verify helm3":             $(helm version --short)
 echo "[x] Verify k9s":               $(k9s version --short)
 
 echo "Verify the binaries are in the path and executable!"
-for command in aws kubectl jq envsubst
+for command in aws kubectl wget jq envsubst
   do
     which $command &>/dev/null && echo "[x] $command in path" || echo "[ ] $command NOT FOUND"
   done
