@@ -28,6 +28,7 @@ sudo yum install -y jq gettext bash-completion wget unzip moreutils
 # sudo resize2fs /dev/nvme0n1p1
 # sudo resize2fs /dev/nvme0n1
 # df -hT
+# df -m /
 
 echo "#########################################################"
 _logger "[+] 1.2. Installing latest AWS CLI - version 2"
@@ -105,6 +106,12 @@ echo "Installing Terraform $version."
 url="https://releases.hashicorp.com/terraform/$version/terraform_$(echo $version)_${KERNEL_TYPE}_amd64.zip"
 curl -L -o terraform_amd64.zip $url
 unzip "terraform_amd64.zip"
+## MacOS
+url="https://releases.hashicorp.com/terraform/0.14.10/terraform_0.14.10_darwin_amd64.zip"
+curl -L -o "terraform_0.14.10_darwin_amd64.zip" $url
+unzip "terraform_0.14.10_darwin_amd64.zip"
+rm "terraform_0.14.10_darwin_amd64.zip"
+
 chmod +x terraform
 sudo mv terraform /usr/local/bin/
 echo "Terraform $version installed."
@@ -138,6 +145,14 @@ echo "Install terraform*.zip file cleaned up."
 ## [TFSec](https://github.com/tfsec/tfsec)
 ## [Checkov](https://pypi.org/project/checkov/)
 
+echo "kubectx"
+sudo git clone https://github.com/ahmetb/kubectx /opt/kubectx
+sudo ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx
+sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
+
+echo "git-remote-codecommit"
+sudo pip install git-remote-codecommit
+
 _logger "[+] Verify Prerequisites ..."
 echo "[x] Verify Git client":        $(git --version)
 echo "[x] Verify jq":                $(jq   --version)
@@ -153,7 +168,7 @@ echo "[x] Verify helm3":             $(helm version --short)
 echo "[x] Verify k9s":               $(k9s version --short)
 
 echo "Verify the binaries are in the path and executable!"
-for command in aws kubectl wget jq envsubst
+for command in aws terraform kubectl eksctl helm kubectx wget jq envsubst
   do
     which $command &>/dev/null && echo "[x] $command in path" || echo "[ ] $command NOT FOUND"
   done
@@ -181,5 +196,19 @@ test -n "$AWS_REGION" && echo AWS_REGION is "$AWS_REGION" || echo AWS_REGION is 
 
 echo "Validate the IAM role container-admin-role"
 aws sts get-caller-identity --query Arn | grep container-admin-role -q && echo "IAM role valid" || echo "EKS IAM Role - NOT valid!"
+
+# instance_id=`curl -s -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id`
+# # echo $instance_id
+# ip=`aws ec2 describe-iam-instance-profile-associations --filters "Name=instance-id,Values=$instance_id" | jq .IamInstanceProfileAssociations[0].IamInstanceProfile.Arn | cut -f2 -d'/' | tr -d '"'`
+# # echo $ip
+# if [ "$ip" != "container-admin-role" ] ; then
+# echo "ERROR: Could not find Instance profile container-admin-role! - DO NOT PROCEED exiting"
+# exit
+# else
+# echo "PASSED: Found Instance profile container-admin-role - proceed with the workshop"
+# fi
+# aws sts get-caller-identity --query Arn | grep container-admin-role -q && echo "PASSED: IAM role valid - container-admin-role" || echo "ERROR: IAM role not valid - DO NOT PROCEED"
+# iname=$(aws ec2 describe-tags --filters "Name=resource-type,Values=instance" "Name=resource-id,Values=$instance_id" | jq -r '.Tags[] | select(.Key=="Name").Value')
+# echo $iname| grep eks-terraform -q && echo "PASSED: Cloud9 IDE name is valid - contains eks-terraform" || echo "ERROR: Cloud9 IDE name invalid! - DO NOT PROCEED"
 
 _logger "[+] ✅⛅️️🚀"

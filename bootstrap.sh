@@ -30,18 +30,28 @@ echo
 ## Create S3 Bucket with Versioning Enabled to store Terraform State
 echo
 echo "#########################################################"
-_logger "[+] Creating S3 Bucket with Versioning Enabled to store Terraform State."
+_logger "[+] 1. Initial setup S3-bucket & DynamoDB-tables for Terraform State files & locks"
+echo "### Creates a s3 bucket for Terraform files..."
+echo "### Creates the DynamoDB tables for Terraform locks"
+echo "### Runs the the gen-backend.sh script from a Terraform null resource' "
 echo "#########################################################"
 echo
 # aws sts get-caller-identity
 
-echo "TF_STATE_S3_BUCKET=${TF_STATE_S3_BUCKET} + AWS_REGION=${AWS_REGION}"
-## Note: us-east-1 does not require a `location-constraint`:
-# aws s3api create-bucket --bucket ${TF_STATE_S3_BUCKET} --region ${AWS_REGION} --create-bucket-configuration || true
-aws s3api create-bucket --bucket ${TF_STATE_S3_BUCKET} --region ${AWS_REGION} --create-bucket-configuration \
-    LocationConstraint=${AWS_REGION} || true
-aws s3api put-bucket-versioning --bucket ${TF_STATE_S3_BUCKET} --versioning-configuration Status=Enabled
+# echo "Creating S3 Bucket with Versioning Enabled to store Terraform State."
+# echo "TF_STATE_S3_BUCKET=${TF_STATE_S3_BUCKET} + AWS_REGION=${AWS_REGION}"
+# ## Note: us-east-1 does not require a `location-constraint`:
+# # aws s3api create-bucket --bucket ${TF_STATE_S3_BUCKET} --region ${AWS_REGION} --create-bucket-configuration || true
+# aws s3api create-bucket --bucket ${TF_STATE_S3_BUCKET} --region ${AWS_REGION} --create-bucket-configuration \
+#     LocationConstraint=${AWS_REGION} || true
+# aws s3api put-bucket-versioning --bucket ${TF_STATE_S3_BUCKET} --versioning-configuration Status=Enabled
 
+# TF_STACK="tf-state-aws"
+# cd  ${WORKING_DIR}/terraform/stacks/${TF_STACK} &&  \
+#     terraform init             &&  \
+#     terraform validate         &&  \
+#     terraform plan -out tfplan &&  \
+#     terraform apply -input=false -auto-approve tfplan
 
 echo
 echo "#########################################################"

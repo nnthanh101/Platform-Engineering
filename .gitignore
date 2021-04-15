@@ -17,3 +17,6 @@
 *.tfstate
 terraform/stacks/*/.terraform
 *.hcl
+terraform/stacks/*/generated
+tfplan
+.terraform.tfstate.lock.info
