@@ -1,21 +1,21 @@
 This guide describes the architecture and implementation of production-ready **Amazon EKS (Elastic Kubernetes Service)** using **Hashicorp Terraform** in multiple *AWS accounts* with a unique *Terraform state*, including 
 
-* [x] 1. **AWS Infrastructure**
-    * [x] 1.1. New **Amazon Virtual Public Cloud** (**VPC**) or specified **Amazon VPC** in same or different **AWS accounts**.
-        * [x] 1.1.1. Standard VPC:
-        * [ ] 1.1.2. Private VPC:
-        * [ ] 1.1.3. Advanced VPC: 
-    * [ ] 1.2.1. [VPC Interface endpoints](https://aws.amazon.com/premiumsupport/knowledge-center/ec2-systems-manager-vpc-endpoints/): the Security-Group should allow “443” INGRESS for your Worker-Node Security-Group. 
+* [x] 2. **AWS Infrastructure**
+    * [x] 2.1. New **Amazon Virtual Public Cloud** (**VPC**) or specified **Amazon VPC** in same or different **AWS accounts**.
+        * [x] 2.1.1. Standard VPC:
+        * [ ] 2.1.2. Private VPC:
+        * [ ] 2.1.3. Advanced VPC: 
+    * [ ] 2.2.1. [VPC Interface endpoints](https://aws.amazon.com/premiumsupport/knowledge-center/ec2-systems-manager-vpc-endpoints/): the Security-Group should allow “443” INGRESS for your Worker-Node Security-Group. 
         * [ ] ec2.$AWS_REGION.amazonaws.com
         * [ ] dkr.ecr.$AWS_REGION.amazonaws.com
         * [ ] api.ecr.$AWS_REGION.amazonaws.com
-    * [ ] 1.2.2. VPC Gateway endpoint: VPC Route-Table associate with Worker-Node Subnets.
+    * [ ] 2.2.2. VPC Gateway endpoint: VPC Route-Table associate with Worker-Node Subnets.
         * [ ] s3.$AWS_REGION.amazonaws.com 
-    * [x] 1.3. VPC-Peering
-    * [x] 1.4. EFS 
-    * [ ] 1.5. [RBAC for Devlopers and Administrators](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html): predefined roles and attach corresponding policies with the roles.
-    * [ ] 1.6. [AWS EC2 Image Builder Pipeline](https://aws.amazon.com/image-builder/)
-* [ ] 2. Provisioning **Amazon EKS cluster**: uses configurable **Terraform modules** with related AWS resources spanned across multiple **AWS accounts**.
+    * [x] 2.4. EFS 
+    * [ ] 2.5. [AWS EC2 Image Builder Pipeline](https://aws.amazon.com/image-builder/)
+* [ ] 3. [RBAC for Devlopers and Administrators](https://docs.aws.amazon.com/eks/latest/userguide/add-user-role.html): predefined roles and attach corresponding policies with the roles.
+* [ ] 4. VPC-Peering
+* [ ] 5. Provisioning **Amazon EKS cluster**: uses configurable **Terraform modules** with related AWS resources spanned across multiple **AWS accounts**.
     * [ ] [Amazon EKS cluster endpoint access control](https://docs.aws.amazon.com/eks/latest/userguide/cluster-endpoint.html#modify-endpoint-access)
         * [ ] Public Amazon EKS cluster exposes public endpoints of other required services  for communication.  
         * [ ] Provision EKS in a fully private VPC with worker nodes in private subnets. Private EKS cluster is not exposed to internet directly.

@@ -54,10 +54,10 @@ aws s3api put-bucket-versioning --bucket ${TF_STATE_S3_BUCKET} --versioning-conf
 
 echo
 echo "#########################################################"
-_logger "[+] 2. [Networking] Provisioning Modern-VPC Stack: teraform/stacks/vpc-*/variables.tf"
-_logger "2.1. Standard VPC >> Public/Private Subnet"
-_logger "2.2. Private  VPC >> Private Subnet Only"
-_logger "2.3. Advanced VPC >> Public/Private/Database/Cache Subnet, Flow Log, VPC Endpoint S3"
+_logger "[+] 2.1. [Networking] Provisioning Modern-VPC Stack: teraform/stacks/vpc-*/variables.tf"
+_logger "2.1.1. Standard VPC >> Public/Private Subnet"
+_logger "2.1.2. Private  VPC >> Private Subnet Only"
+_logger "2.1.3. Advanced VPC >> Public/Private/Database/Cache Subnet, Flow Log, VPC Endpoint S3"
 echo "#########################################################"
 echo
 vpc_options=("Standard VPC" "Private VPC" "Advanced VPC - Flow Log to S3" "Advanced VPC - Flow Log to CloudWatch")
@@ -96,14 +96,14 @@ terraform apply -input=false -auto-approve ${PROJECT_ID}.vpc.tfplan
 ## FIXME1 VPC-Endpoints
 # echo
 # echo "#########################################################"
-# _logger "[+] 1.2. VPC Interface/Gateway Endpoints: teraform/stacks/XXX/terraform.tfvars"
+# _logger "[+] 2.2. VPC Interface/Gateway Endpoints: teraform/stacks/XXX/terraform.tfvars"
 # echo "#########################################################"
 # echo
 
 ## FIXME2 VPC-Peering
 # echo
 # echo "#########################################################"
-# _logger "[+] 1.3. VPC Peering: teraform/stacks/vpc-peering/terraform.tfvars"
+# _logger "[+] 2.3. VPC Peering: teraform/stacks/vpc-peering/terraform.tfvars"
 # echo " [DevTest]      AWS-Account1-VPC1: CI/CD Pipeline - Code*, Jenkins, GitLab
 # echo " [Staging/Prod] AWS-Account2-VPC2: EKS Cluster Staging/Prod
 # echo "#########################################################"
@@ -118,7 +118,7 @@ terraform apply -input=false -auto-approve ${PROJECT_ID}.vpc.tfplan
 ## FIXME3 EFS
 # echo
 # echo "#########################################################"
-# _logger "[+] 1.4. Provisioning EFS Stack: teraform/stacks/efs/terraform.tfvars"
+# _logger "[+] 2.4. Provisioning EFS Stack: teraform/stacks/efs/terraform.tfvars"
 # echo "#########################################################"
 # echo
 
@@ -131,7 +131,7 @@ terraform apply -input=false -auto-approve ${PROJECT_ID}.vpc.tfplan
 ## FIXME4 EC2-Image-Builder
 # echo
 # echo "#########################################################"
-# _logger "[+] 1.6. AWS EC2 Image Builder Pipeline: teraform/stacks/ec2-image-builder/terraform.tfvars"
+# _logger "[+] 2.5. AWS EC2 Image Builder Pipeline: teraform/stacks/ec2-image-builder/terraform.tfvars"
 # echo "#########################################################"
 # echo
 
