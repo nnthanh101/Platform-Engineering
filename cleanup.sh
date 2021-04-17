@@ -25,8 +25,28 @@ echo
 echo "======================================="
 _logger "[+] 6. Cleaning up ${PROJECT_ID}-VPC Stack ===="
 echo "======================================="
-cd ${WORKING_DIR}/terraform/stacks/vpc && \
-    terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-vpc-stack.tfstate" && \
+
+# Get current vpc type information
+vpc_type=$(aws ec2 describe-vpcs --filters=Name=tag:ProjectID,Values=$PROJECT_ID |jq -r '.Vpcs[].Tags[] | select(.Key == "VPCType") | .Value' 2>/dev/null)
+case $vpc_type in
+    "$VPC_TYPE_STANDARD")
+        echo "Destroying $vpc_type..."
+        export TF_VAR_vpc_type=$VPC_TYPE_STANDARD
+        cd ${WORKING_DIR}/terraform/stacks/vpc
+        ;;
+    "$VPC_TYPE_PRIVATE")
+        echo "Destroying $vpc_type..."
+        export TF_VAR_vpc_type=$VPC_TYPE_PRIVATE
+        cd ${WORKING_DIR}/terraform/stacks/vpc-private
+        ;;
+    "$VPC_TYPE_ADVANCED")
+        echo "Destroying $vpc_type..."
+        export TF_VAR_vpc_type=$VPC_TYPE_ADVANCED
+        cd ${WORKING_DIR}/terraform/stacks/vpc-advanced
+        ;;
+esac
+
+terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-vpc-stack.tfstate" && \
     terraform refresh && \
     terraform plan -destroy && \
     terraform destroy -auto-approve
@@ -46,7 +66,6 @@ if [ $count -gt -1 ]; then
                 key=`echo $versions | jq .[$i].Key |sed -e 's/\"//g'`
                 versionId=`echo $versions | jq .[$i].VersionId |sed -e 's/\"//g'`
                 cmd="aws s3api delete-object --bucket ${TF_STATE_S3_BUCKET} --key $key --version-id $versionId"
-                # echo $cmd
                 $cmd
         done
 fi
@@ -59,7 +78,6 @@ if [ $count -gt -1 ]; then
                 key=`echo $markers | jq .[$i].Key |sed -e 's/\"//g'`
                 versionId=`echo $markers | jq .[$i].VersionId |sed -e 's/\"//g'`
                 cmd="aws s3api delete-object --bucket ${TF_STATE_S3_BUCKET} --key $key --version-id $versionId"
-                # echo $cmd
                 $cmd
         done
 fi

@@ -34,17 +34,10 @@ _logger "[+] 1. Initial setup S3-bucket & DynamoDB-tables for Terraform State fi
 echo "### Creates a s3 bucket for Terraform files..."
 echo "### Creates the DynamoDB tables for Terraform locks"
 echo "### Runs the the gen-backend.sh script from a Terraform null resource' "
+_logger "[+] 1. Creating S3 Bucket with Versioning Enabled to store Terraform State."
 echo "#########################################################"
 echo
 # aws sts get-caller-identity
-
-# echo "Creating S3 Bucket with Versioning Enabled to store Terraform State."
-# echo "TF_STATE_S3_BUCKET=${TF_STATE_S3_BUCKET} + AWS_REGION=${AWS_REGION}"
-# ## Note: us-east-1 does not require a `location-constraint`:
-# # aws s3api create-bucket --bucket ${TF_STATE_S3_BUCKET} --region ${AWS_REGION} --create-bucket-configuration || true
-# aws s3api create-bucket --bucket ${TF_STATE_S3_BUCKET} --region ${AWS_REGION} --create-bucket-configuration \
-#     LocationConstraint=${AWS_REGION} || true
-# aws s3api put-bucket-versioning --bucket ${TF_STATE_S3_BUCKET} --versioning-configuration Status=Enabled
 
 # TF_STACK="tf-state-aws"
 # cd  ${WORKING_DIR}/terraform/stacks/${TF_STACK} &&  \
@@ -53,25 +46,54 @@ echo
 #     terraform plan -out tfplan &&  \
 #     terraform apply -input=false -auto-approve tfplan
 
+echo "TF_STATE_S3_BUCKET=${TF_STATE_S3_BUCKET} + AWS_REGION=${AWS_REGION}"
+## Note: us-east-1 does not require a `location-constraint`:
+aws s3api create-bucket --bucket ${TF_STATE_S3_BUCKET} --region ${AWS_REGION} --create-bucket-configuration \
+    LocationConstraint=${AWS_REGION} 2>/dev/null || true
+aws s3api put-bucket-versioning --bucket ${TF_STATE_S3_BUCKET} --versioning-configuration Status=Enabled 2>/dev/null || true
+
 echo
 echo "#########################################################"
-_logger "[+] 1.1. [AWS-Infra] Provisioning Modern-VPC Stack: teraform/stacks/vpc/terraform.tfvars"
-_logger "1.1.1. Standard VPC >> "
-echo    "1.1.2. Private  VPC >> "
-echo    "1.1.3. Advanced VPC >> "
+_logger "[+] 2. [Networking] Provisioning Modern-VPC Stack: teraform/stacks/vpc-*/variables.tf"
+_logger "2.1. Standard VPC >> Public/Private Subnet"
+_logger "2.2. Private  VPC >> Private Subnet Only"
+_logger "2.3. Advanced VPC >> Public/Private/Database/Cache Subnet, Flow Log, VPC Endpoint S3"
 echo "#########################################################"
 echo
+vpc_options=("Standard VPC" "Private VPC" "Advanced VPC - Flow Log to S3" "Advanced VPC - Flow Log to CloudWatch")
+PS3='Please enter your choice: '
+select opt in "${vpc_options[@]}"
+do
+    case $REPLY in
+        1)
+        echo "Provisioning $opt..."
+        export TF_VAR_vpc_type=$VPC_TYPE_STANDARD
+        cd ${WORKING_DIR}/terraform/stacks/vpc
+        ;;
+        2)
+        echo "Provisioning $opt..."
+        export TF_VAR_vpc_type=$VPC_TYPE_PRIVATE
+        cd ${WORKING_DIR}/terraform/stacks/vpc-private
+        ;;
+        3)
+        echo "Provisioning $opt..."
+        export TF_VAR_vpc_type=$VPC_TYPE_ADVANCED
+        cd ${WORKING_DIR}/terraform/stacks/vpc-advanced
+        ;;
+        4)
+        echo "Provisioning $opt..."
+        export TF_VAR_vpc_type=$VPC_TYPE_ADVANCED
+        export TF_VAR_vpc_flow_log_destination="cloud-watch-logs"
+        cd ${WORKING_DIR}/terraform/stacks/vpc-advanced
+        ;;
+    esac
+    break
+done
+terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-vpc-stack.tfstate" && \
+terraform plan -out ${PROJECT_ID}.vpc.tfplan && \
+terraform apply -input=false -auto-approve ${PROJECT_ID}.vpc.tfplan
 
-# echo "WORKING_DIR="${WORKING_DIR}
-# read -p "[Modern-VPC] Press key to continue.. " -n1 -s
-# sleep 15
-
-cd  ${WORKING_DIR}/terraform/stacks/vpc &&           \
-    terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-vpc-stack.tfstate" && \
-    terraform plan -out ${PROJECT_ID}.vpc.tfplan &&  \
-    terraform apply -input=false -auto-approve ${PROJECT_ID}.vpc.tfplan
-
-## FIXME3 VPC-Endpoints
+## FIXME1 VPC-Endpoints
 # echo
 # echo "#########################################################"
 # _logger "[+] 1.2. VPC Interface/Gateway Endpoints: teraform/stacks/XXX/terraform.tfvars"
@@ -93,7 +115,7 @@ cd  ${WORKING_DIR}/terraform/stacks/vpc &&           \
 #     terraform apply -input=false -auto-approve ${PROJECT_ID}.vpc-peering.tfplan
 
 
-## FIXME1 EFS
+## FIXME3 EFS
 # echo
 # echo "#########################################################"
 # _logger "[+] 1.4. Provisioning EFS Stack: teraform/stacks/efs/terraform.tfvars"
@@ -117,7 +139,6 @@ cd  ${WORKING_DIR}/terraform/stacks/vpc &&           \
 #     terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-ec2-image-builder-stack.tfstate"
 #     terraform plan -out ${PROJECT_ID}.ec2-image-builder.tfplan &&  \
 #     terraform apply -input=false -auto-approve ${PROJECT_ID}.ec2-image-builder.tfplan
-
 
 ended_time=$(date '+%d/%m/%Y %H:%M:%S')
 echo

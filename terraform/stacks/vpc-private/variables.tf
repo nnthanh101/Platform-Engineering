@@ -19,11 +19,6 @@ variable "vpc_private_subnets" {
   default = []
 }
 
-variable "vpc_public_subnets" {
-  type = list
-  default = []
-}
-
 variable "vpc_enable_nat_gateway" {
   default = true
 }
@@ -33,7 +28,7 @@ variable "vpc_enable_vpn_gateway" {
 }
 
 variable "vpc_single_nat_gateway" {
-  default = true
+  default = false
 }
 
 variable "enable_s3_endpoint" {
