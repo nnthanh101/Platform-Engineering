@@ -1,3 +1,7 @@
+<p align="center"> 
+<img src="README/eks-scenario.png">
+</p>
+
 This guide describes the architecture and implementation of production-ready **Amazon EKS (Elastic Kubernetes Service)** using **Hashicorp Terraform** in multiple *AWS accounts* with a unique *Terraform state*, including 
 
 * [x] 2. **AWS Infrastructure**
