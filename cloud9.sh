@@ -19,7 +19,7 @@ _logger "[+] 1.1. Installing Utilities: jq, wget, unzip ..."
 echo "#########################################################"
 sudo yum -y update
 sudo yum -y upgrade
-sudo yum install -y jq gettext bash-completion wget unzip moreutils
+sudo yum install -y jq gettext bash-completion wget unzip moreutils nmap bind-utils
 
 # echo "[+] AMZ-Linux2/CenOS EBS Extending a Partition on a T2/T3 Instance"
 # sudo growpart /dev/nvme0n1 1
@@ -140,11 +140,6 @@ echo "Install terraform*.zip file cleaned up."
 #     exit 1
 # fi
 
-## FIXME5
-## [K8sLens](https://k8slens.dev/)
-## [TFSec](https://github.com/tfsec/tfsec)
-## [Checkov](https://pypi.org/project/checkov/)
-
 echo "kubectx"
 sudo git clone https://github.com/ahmetb/kubectx /opt/kubectx
 sudo ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx
@@ -152,6 +147,27 @@ sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
 
 echo "git-remote-codecommit"
 sudo pip install git-remote-codecommit
+
+## FIXME5
+## [K8sLens](https://k8slens.dev/)
+## [TFSec](https://github.com/tfsec/tfsec)
+## [Checkov](https://pypi.org/project/checkov/)
+
+## [Terrascan](https://github.com/accurics/terrascan) detects security vulnerabilities and compliance violations across your Infrastructure as Code. 
+sudo pip install terrascan
+
+echo "ssh key"
+mkdir -p ~/.ssh
+ssh-keygen -b 2048 -t rsa -f ~/.ssh/id_rsa -q -N ""
+chmod 600 ~/.ssh/id*
+aws ec2 delete-key-pair --key-name "terraform-eks"
+aws ec2 import-key-pair --key-name "terraform-eks" --public-key-material fileb://~/.ssh/id_rsa.pub
+
+## SSM add on
+curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm" -o "session-manager-plugin.rpm"
+sudo yum install -y session-manager-plugin.rpm
+session-manager-plugin
+rm session-manager-plugin.rpm
 
 _logger "[+] Verify Prerequisites ..."
 echo "[x] Verify Git client":        $(git --version)
@@ -211,4 +227,4 @@ aws sts get-caller-identity --query Arn | grep container-admin-role -q && echo "
 # iname=$(aws ec2 describe-tags --filters "Name=resource-type,Values=instance" "Name=resource-id,Values=$instance_id" | jq -r '.Tags[] | select(.Key=="Name").Value')
 # echo $iname| grep eks-terraform -q && echo "PASSED: Cloud9 IDE name is valid - contains eks-terraform" || echo "ERROR: Cloud9 IDE name invalid! - DO NOT PROCEED"
 
-_logger "[+] ✅⛅️️🚀"
+_logger "[+] Configure Cloud 9 & AWS Settings ✅⛅️️🚀"
