@@ -40,4 +40,3 @@ module "vpc" {
     Endpoint  = "true"
   }
 }
-

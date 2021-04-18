@@ -103,14 +103,14 @@ version=0.14.10
 # version=$(curl https://api.github.com/repos/hashicorp/terraform/releases/latest --silent | jq ".tag_name" -r)
 # version=$(echo $version | sed 's/v//g') # get rid of 'v' from version number
 echo "Installing Terraform $version."
-url="https://releases.hashicorp.com/terraform/$version/terraform_$(echo $version)_${KERNEL_TYPE}_amd64.zip"
+url="https://releases.hashicorp.com/terraform/$version/terraform_$(echo $version)_linux_amd64.zip"
 curl -L -o terraform_amd64.zip $url
 unzip "terraform_amd64.zip"
 ## MacOS
-url="https://releases.hashicorp.com/terraform/0.14.10/terraform_0.14.10_darwin_amd64.zip"
-curl -L -o "terraform_0.14.10_darwin_amd64.zip" $url
-unzip "terraform_0.14.10_darwin_amd64.zip"
-rm "terraform_0.14.10_darwin_amd64.zip"
+# url="https://releases.hashicorp.com/terraform/0.14.10/terraform_0.14.10_darwin_amd64.zip"
+# curl -L -o "terraform_0.14.10_darwin_amd64.zip" $url
+# unzip "terraform_0.14.10_darwin_amd64.zip"
+# rm "terraform_0.14.10_darwin_amd64.zip"
 
 chmod +x terraform
 sudo mv terraform /usr/local/bin/
