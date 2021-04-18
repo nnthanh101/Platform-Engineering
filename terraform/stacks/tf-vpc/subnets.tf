@@ -1,6 +1,6 @@
 resource "aws_subnet" "tf-private-subnet" {
   assign_ipv6_address_on_creation = false
-  availability_zone               = "ap-southeast-1"
+  availability_zone               = "ap-southeast-1a"
   cidr_block                      = "10.1.4.0/24"
   map_public_ip_on_launch         = false
   tags = {
@@ -13,7 +13,7 @@ resource "aws_subnet" "tf-private-subnet" {
 
 resource "aws_subnet" "tf-public-subnet" {
   assign_ipv6_address_on_creation = false
-  availability_zone               = "ap-southeast-1"
+  availability_zone               = "ap-southeast-1a"
   cidr_block                      = "10.1.1.0/24"
   map_public_ip_on_launch         = false
   tags = {
