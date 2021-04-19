@@ -40,7 +40,7 @@ echo
 # aws sts get-caller-identity
 
 # TF_STACK="tf-state-aws"
-# cd  ${WORKING_DIR}/terraform/stacks/${TF_STACK} &&  \
+# cd  ${WORKING_DIR}/modules/${TF_STACK} &&  \
 #     terraform init             &&  \
 #     terraform validate         &&  \
 #     terraform plan -out tfplan &&  \
@@ -68,23 +68,23 @@ do
         1)
         echo "Provisioning $opt..."
         export TF_VAR_vpc_type=$VPC_TYPE_STANDARD
-        cd ${WORKING_DIR}/terraform/stacks/vpc
+        cd ${WORKING_DIR}/modules/vpc
         ;;
         2)
         echo "Provisioning $opt..."
         export TF_VAR_vpc_type=$VPC_TYPE_PRIVATE
-        cd ${WORKING_DIR}/terraform/stacks/vpc-private
+        cd ${WORKING_DIR}/modules/vpc-private
         ;;
         3)
         echo "Provisioning $opt..."
         export TF_VAR_vpc_type=$VPC_TYPE_ADVANCED
-        cd ${WORKING_DIR}/terraform/stacks/vpc-advanced
+        cd ${WORKING_DIR}/modules/vpc-advanced
         ;;
         4)
         echo "Provisioning $opt..."
         export TF_VAR_vpc_type=$VPC_TYPE_ADVANCED
         export TF_VAR_vpc_flow_log_destination="cloud-watch-logs"
-        cd ${WORKING_DIR}/terraform/stacks/vpc-advanced
+        cd ${WORKING_DIR}/modules/vpc-advanced
         ;;
     esac
     break
@@ -109,7 +109,7 @@ terraform apply -input=false -auto-approve ${PROJECT_ID}.vpc.tfplan
 # echo "#########################################################"
 # echo
 
-# cd  ${WORKING_DIR}/terraform/stacks/vpc-peering &&           \
+# cd  ${WORKING_DIR}/modules/vpc-peering &&           \
 #     terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-vpc-peering-stack.tfstate"
 #     terraform plan -out ${PROJECT_ID}.vpc-peering.tfplan &&  \
 #     terraform apply -input=false -auto-approve ${PROJECT_ID}.vpc-peering.tfplan
@@ -122,7 +122,7 @@ terraform apply -input=false -auto-approve ${PROJECT_ID}.vpc.tfplan
 # echo "#########################################################"
 # echo
 
-# cd  ${WORKING_DIR}/terraform/stacks/efs &&           \
+# cd  ${WORKING_DIR}/modules/efs &&           \
 #     terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-efs-stack.tfstate"
 #     terraform plan -out ${PROJECT_ID}.efs.tfplan &&  \
 #     terraform apply -input=false -auto-approve ${PROJECT_ID}.efs.tfplan
@@ -135,7 +135,7 @@ terraform apply -input=false -auto-approve ${PROJECT_ID}.vpc.tfplan
 # echo "#########################################################"
 # echo
 
-# cd  ${WORKING_DIR}/terraform/stacks/ec2-image-builder &&           \
+# cd  ${WORKING_DIR}/modules/ec2-image-builder &&           \
 #     terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-ec2-image-builder-stack.tfstate"
 #     terraform plan -out ${PROJECT_ID}.ec2-image-builder.tfplan &&  \
 #     terraform apply -input=false -auto-approve ${PROJECT_ID}.ec2-image-builder.tfplan
