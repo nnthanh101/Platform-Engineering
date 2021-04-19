@@ -23,3 +23,7 @@ terraform/stacks/*/.terraform
 terraform/stacks/*/generated
 *.hcl
 tfplan
+
+.terraform
+# terraform*
+# test/.terraform

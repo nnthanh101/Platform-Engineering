@@ -1,10 +1,11 @@
-resource "aws_vpc" "tf-vpc" {
+resource "aws_vpc" "VPC" {
+  count                            = var.tf-count
   assign_generated_ipv6_cidr_block = false
-  cidr_block                       = "10.1.0.0/16"
-  enable_dns_hostnames             = true
+  cidr_block                       = lookup(var.aws_cidr, var.aws_vpc[count.index])
+  enable_dns_hostnames             = false
   enable_dns_support               = true
   instance_tenancy                 = "default"
   tags = {
-    "Name" = "TF-VPC"
+    "Name" = var.aws_vpc[count.index]
   }
 }

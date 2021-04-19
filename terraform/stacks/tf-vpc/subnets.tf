@@ -1,25 +1,27 @@
-resource "aws_subnet" "tf-private-subnet" {
+resource "aws_subnet" "tf-public-subnet" {
+  count                           = var.tf-count
   assign_ipv6_address_on_creation = false
   availability_zone               = "ap-southeast-1a"
-  cidr_block                      = "10.1.4.0/24"
+  cidr_block                      = format("172.30.0.%s/27", count.index)
   map_public_ip_on_launch         = false
   tags = {
-    "Name" = "TF-Private-Subnet"
+    "Name" = format("Public-Subnet 172.30.0.%s/27", count.index)
   }
-  vpc_id = aws_vpc.tf-vpc.id
+  vpc_id = aws_vpc.VPC[count.index].id
 
   timeouts {}
 }
 
-resource "aws_subnet" "tf-public-subnet" {
+resource "aws_subnet" "tf-private-subnet" {
+  count                           = var.tf-count
   assign_ipv6_address_on_creation = false
   availability_zone               = "ap-southeast-1a"
-  cidr_block                      = "10.1.1.0/24"
+  cidr_block                      = "172.30.0.128/27"
   map_public_ip_on_launch         = false
   tags = {
-    "Name" = "TF-Public-Subnet"
+    "Name" = "Private-Subnet 172.30.0.128/27"
   }
-  vpc_id = aws_vpc.tf-vpc.id
+  vpc_id = aws_vpc.VPC[count.index].id
 
   timeouts {}
 }

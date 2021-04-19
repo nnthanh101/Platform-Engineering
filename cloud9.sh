@@ -226,5 +226,10 @@ aws sts get-caller-identity --query Arn | grep container-admin-role -q && echo "
 # aws sts get-caller-identity --query Arn | grep container-admin-role -q && echo "PASSED: IAM role valid - container-admin-role" || echo "ERROR: IAM role not valid - DO NOT PROCEED"
 # iname=$(aws ec2 describe-tags --filters "Name=resource-type,Values=instance" "Name=resource-id,Values=$instance_id" | jq -r '.Tags[] | select(.Key=="Name").Value')
 # echo $iname| grep eks-terraform -q && echo "PASSED: Cloud9 IDE name is valid - contains eks-terraform" || echo "ERROR: Cloud9 IDE name invalid! - DO NOT PROCEED"
+# key_name=`aws ec2 describe-key-pairs --query "KeyPairs[?KeyName=='terraform-eks'].KeyName" | grep net | tr -d ' ' | tr -d '"'`
+# if [ $key_name != "terraform-eks" ]; then
+# echo "Could not find terraform-eks key pair - create before proceeding"
+# exit
+# fi
 
 _logger "[+] Configure Cloud 9 & AWS Settings ✅⛅️️🚀"
