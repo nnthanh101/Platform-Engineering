@@ -1,0 +1,138 @@
+name: 'Terraform'
+
+on:
+  push:
+    branches:
+    - terraform
+    - terraform-**
+    - EKS
+  pull_request:
+
+jobs:
+  setup-tools:
+    name: 'Setup tools'
+    runs-on: ubuntu-latest
+    environment: dev
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+    - name: Setup tools
+      run: ./scripts/install-tools.sh 
+  
+  vpc:
+    name: 'EKS-VPC'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: setup-tools
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from AWS account (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION  )
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region:            ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+        subname=$(echo "${GITHUB_REF##*/}" | sed -E 's:^terraform-(.*):\1:')
+        echo TF_VAR_vpc_type=$VPC_TYPE_PRIVATE >> $GITHUB_ENV
+        echo TF_VAR_vpc_name=$TF_VAR_vpc_name-$subname-$TF_VAR_vpc_type >> $GITHUB_ENV
+
+    - name: Setup S3 bucket
+      run: |
+        aws s3api create-bucket --bucket ${TF_STATE_S3_BUCKET} --region ${AWS_REGION} --create-bucket-configuration LocationConstraint=${AWS_REGION} 2>/dev/null || true
+        aws s3api put-bucket-versioning --bucket ${TF_STATE_S3_BUCKET} --versioning-configuration Status=Enabled 2>/dev/null || true
+        aws s3api list-buckets
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      run: cd ./modules/vpc-private && terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-vpc-${TF_VAR_vpc_name}.tfstate"
+
+    # Checks that all Terraform configuration files adhere to a canonical format
+    - name: Terraform Format
+      run: cd ./modules/vpc-private && terraform fmt -check 
+
+    # Generates an execution plan for Terraform
+    - name: Terraform Plan
+      run: cd ./modules/vpc-private && terraform plan 
+
+    - name: Terraform Apply
+      run: cd ./modules/vpc-private && terraform apply -auto-approve 
+
+    - name: Archive tfplan
+      uses: actions/upload-artifact@v2
+      with:
+        name: vpc-private-tfplan
+        path: ./modules/vpc-private/tfplan
+
+  
+  vpc-endpoint:
+    name: 'VPC Endpoints'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [setup-tools, vpc]
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials from Test account
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region:            ${{ secrets.AWS_REGION }}
+    
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+        subname=$(echo "${GITHUB_REF##*/}" | sed -E 's:^terraform-(.*):\1:')
+        echo TF_VAR_vpc_type=$VPC_TYPE_PRIVATE >> $GITHUB_ENV
+        echo TF_VAR_vpc_name=$TF_VAR_vpc_name-$subname-$TF_VAR_vpc_type >> $GITHUB_ENV
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Init
+      run: cd ./modules/vpc-endpoint && terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-vpc-endpoint-${TF_VAR_vpc_name}.tfstate"
+
+    # Checks that all Terraform configuration files adhere to a canonical format
+    - name: Terraform Format
+      run: cd ./modules/vpc-endpoint && terraform fmt -check 
+
+    # Generates an execution plan for Terraform
+    - name: Terraform Plan
+      run: cd ./modules/vpc-endpoint && terraform plan 
+
+    - name: Terraform Apply
+      run: cd ./modules/vpc-endpoint && terraform apply -auto-approve 
+
+    - name: Archive tfplan
+      uses: actions/upload-artifact@v2
+      with:
+        name: vpc-endpoint-tfplan
+        path: ./modules/vpc-endpoint/tfplan
