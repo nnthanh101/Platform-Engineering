@@ -55,7 +55,7 @@ jobs:
         source ./environment/dev/.env && env >> $GITHUB_ENV
         subname=$(echo "${GITHUB_REF##*/}" | sed -E 's:^terraform-(.*):\1:')
         echo TF_VAR_vpc_type=$VPC_TYPE_PRIVATE >> $GITHUB_ENV
-        echo TF_VAR_vpc_name=$TF_VAR_vpc_name-$subname-$TF_VAR_vpc_type >> $GITHUB_ENV
+        echo TF_VAR_vpc_name=$TF_VAR_vpc_name-$subname >> $GITHUB_ENV
 
     - name: Setup S3 bucket
       run: |
