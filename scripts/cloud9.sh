@@ -140,10 +140,10 @@ echo "Install terraform*.zip file cleaned up."
 #     exit 1
 # fi
 
-echo "kubectx"
-sudo git clone https://github.com/ahmetb/kubectx /opt/kubectx
-sudo ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx
-sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
+# echo "kubectx"
+# sudo git clone https://github.com/ahmetb/kubectx /opt/kubectx
+# sudo ln -s /opt/kubectx/kubectx /usr/local/bin/kubectx
+# sudo ln -s /opt/kubectx/kubens /usr/local/bin/kubens
 
 echo "git-remote-codecommit"
 sudo pip install git-remote-codecommit
@@ -169,6 +169,17 @@ sudo yum install -y session-manager-plugin.rpm
 session-manager-plugin
 rm session-manager-plugin.rpm
 
+echo "#########################################################"
+_logger "[+] 4. Java 11 Amazon-Corretto & Maven"
+echo "#########################################################"
+sudo wget http://repos.fedorapeople.org/repos/dchen/apache-maven/epel-apache-maven.repo -O /etc/yum.repos.d/epel-apache-maven.repo
+sudo sed -i s/\$releasever/6/g /etc/yum.repos.d/epel-apache-maven.repo
+sudo yum install -y apache-maven
+
+sudo yum install java-11-amazon-corretto
+sudo alternatives --config java  #enter the number for corretto 11
+sudo alternatives --config javac #enter the number for corretto 11
+
 _logger "[+] Verify Prerequisites ..."
 echo "[x] Verify Git client":        $(git --version)
 echo "[x] Verify jq":                $(jq   --version)
@@ -182,9 +193,12 @@ echo "[x] Verify kubectl":           $(kubectl version --client)
 echo "[x] Verify eksctl":            $(eksctl version)
 echo "[x] Verify helm3":             $(helm version --short)
 echo "[x] Verify k9s":               $(k9s version --short)
+echo "[x] Verify Java":              $(java --version)
+echo "[x] Verify Maven":             $(mvn --version)
+
 
 echo "Verify the binaries are in the path and executable!"
-for command in aws terraform kubectl eksctl helm kubectx wget jq envsubst
+for command in aws terraform kubectl eksctl helm wget jq envsubst
   do
     which $command &>/dev/null && echo "[x] $command in path" || echo "[ ] $command NOT FOUND"
   done
