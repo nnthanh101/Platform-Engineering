@@ -2,6 +2,18 @@ variable "PROJECT_ID" {
   default = ""
 }
 
+variable "org" {
+  default = ""
+}
+
+variable "tenant" {
+  default = ""
+}
+
+variable "environment" {
+  default = ""
+}
+
 variable "region" {
   default = "ap-southeast-1"
 }

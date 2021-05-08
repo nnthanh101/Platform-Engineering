@@ -64,8 +64,11 @@ module "vpc" {
   flow_log_cloudwatch_iam_role_arn    = local.flow_log_to_s3 ? "" : aws_iam_role.vpc_flow_log_cloudwatch[0].arn
 
   tags = {
-    ProjectID         = var.PROJECT_ID
-    VPCType           = var.vpc_type
+    ProjectID   = var.PROJECT_ID
+    org         = var.org
+    tenant      = var.tenant
+    environment = var.environment
+    VPCType     = var.vpc_type
   }
 
   vpc_endpoint_tags = {

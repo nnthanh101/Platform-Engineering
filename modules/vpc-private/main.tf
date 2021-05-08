@@ -1,11 +1,11 @@
 terraform {
   backend "s3" {
-    region = var.region 
+    region = var.region
   }
 }
 
 provider "aws" {
-  region  = var.region
+  region = var.region
 }
 
 data "aws_availability_zones" "available" {
@@ -25,15 +25,18 @@ module "vpc" {
   enable_dns_hostnames = true
   enable_dns_support   = true
 
-  enable_s3_endpoint   = var.enable_s3_endpoint
+  enable_s3_endpoint = false
 
   tags = {
     ProjectID   = var.PROJECT_ID
+    org         = var.org
+    tenant      = var.tenant
+    environment = var.environment
     VPCType     = var.vpc_type
   }
-  
+
   vpc_endpoint_tags = {
-    Endpoint  = "true"
+    Endpoint = "true"
   }
 }
 

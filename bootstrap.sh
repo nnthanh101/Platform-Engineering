@@ -9,7 +9,9 @@ function _logger() {
     echo -e "$(date) ${YELLOW}[*] $@ ${NC}"
 }
 
-parsed=(${1//=/ })
+source ./.env
+param=${1:--env=dev}
+parsed=(${param//=/ })
 env=$(echo ${parsed[1]})
 env=${env:-dev}
 TF_ENV="./environment/$env"
@@ -90,6 +92,17 @@ terraform plan -out tfplan && \
 # terraform show tfplan && \
 terraform apply -input=false -auto-approve tfplan
 
+
+# echo
+# echo "#########################################################"
+# _logger "[+] 2.2. VPC Interface/Gateway Endpoints: teraform/stacks/XXX/terraform.tfvars"
+# echo "#########################################################"
+# echo
+cd ${WORKING_DIR}/modules/vpc-endpoint
+terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-vpc-endpoint.tfstate" && \
+terraform plan -out tfplan && \
+# terraform show tfplan && \
+terraform apply -input=false -auto-approve tfplan
 
 # echo
 # echo "#########################################################"
