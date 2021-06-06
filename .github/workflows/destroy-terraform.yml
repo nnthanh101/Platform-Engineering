@@ -1,0 +1,446 @@
+name: Destroy terraform
+on:
+  workflow_dispatch:
+    inputs:
+      name:
+        description: 'Input "destroy" to destroy'
+        required: true
+        default: ''
+
+jobs:
+  setup-tools:
+    name: 'Setup tools'
+    runs-on: ubuntu-latest
+    environment: dev
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+    - name: Setup tools
+      run: ./scripts/install-tools.sh 
+  
+  destroy-node-termination-handler:
+    name: 'Destroy Cluster Autoscaler'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: setup-tools
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from AWS account (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION  )
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region:            ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+        echo TF_VAR_vpc_type=$VPC_TYPE_PRIVATE >> $GITHUB_ENV
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Destroy
+      run: |
+        cd ./modules/node-termination-handler && terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-node-termination-handler.tfstate"
+        terraform refresh && terraform plan -destroy && terraform destroy -auto-approve
+  
+  destroy-cluster-autoscaler:
+    name: 'Destroy Cluster Autoscaler'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: setup-tools
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from AWS account (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION  )
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region:            ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+        echo TF_VAR_vpc_type=$VPC_TYPE_PRIVATE >> $GITHUB_ENV
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Destroy
+      run: |
+        cd ./modules/autoscaler && terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-cluster-autoscaler.tfstate"
+        terraform refresh && terraform plan -destroy && terraform destroy -auto-approve
+  
+  destroy-metrics-server:
+    name: 'Destroy Metrics Server'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: setup-tools
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from AWS account (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION  )
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region:            ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+        echo TF_VAR_vpc_type=$VPC_TYPE_PRIVATE >> $GITHUB_ENV
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Destroy
+      run: |
+        cd ./modules/metrics-server && terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-metrics-server.tfstate"
+        terraform refresh && terraform plan -destroy && terraform destroy -auto-approve
+  
+  destroy-alb:
+    name: 'Destroy ALB'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: setup-tools
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from AWS account (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION  )
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region:            ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+        echo TF_VAR_vpc_type=$VPC_TYPE_PRIVATE >> $GITHUB_ENV
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Destroy
+      run: |
+        cd ./modules/alb && terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-alb.tfstate"
+        terraform refresh && terraform plan -destroy && terraform destroy -auto-approve
+
+  destroy-efs:
+    name: 'Destroy EFS'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: setup-tools
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from AWS account (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION  )
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region:            ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+        echo TF_VAR_vpc_type=$VPC_TYPE_PRIVATE >> $GITHUB_ENV
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Destroy
+      run: |
+        cd ./modules/efs && terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-efs-${TF_VAR_vpc_name}.tfstate"
+        terraform refresh && terraform plan -destroy && terraform destroy -auto-approve
+
+  
+  destroy-eks-cluster:
+    name: 'Destroy EKS Cluster'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [setup-tools, destroy-alb, destroy-cluster-autoscaler, destroy-metrics-server, destroy-efs]
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from AWS account (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION  )
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region:            ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+        echo TF_VAR_vpc_type=$VPC_TYPE_PRIVATE >> $GITHUB_ENV
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Destroy
+      run: |
+        cd ./modules/eks-cluster && terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-eks-cluster.tfstate"
+        terraform refresh && terraform plan -destroy && terraform destroy -auto-approve
+  
+  destroy-vpc-endpoint:
+    name: 'Destroy VPC Endpoints'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: setup-tools
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from AWS account (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION  )
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region:            ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+        echo TF_VAR_vpc_type=$VPC_TYPE_PRIVATE >> $GITHUB_ENV
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Destroy
+      run: |
+        cd ./modules/vpc-private && terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-vpc-endpoint.tfstate"
+        terraform refresh && terraform plan -destroy && terraform destroy -auto-approve
+
+  destroy-ec2-image-builder:
+    name: 'Destroy EC2 Image Builder'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: setup-tools
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from AWS account (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION  )
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region:            ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+        echo TF_VAR_vpc_type=$VPC_TYPE_PRIVATE >> $GITHUB_ENV
+        echo TF_VAR_ec2_image_builder_component_file=../../environment/dev/ec2-component.yml >> $GITHUB_ENV
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Destroy
+      run: |
+        cd ./modules/ec2-image-builder && terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-ec2-image-builder.tfstate"
+        terraform refresh && terraform plan -destroy && terraform destroy -auto-approve
+
+
+  destroy-vpc-peering:
+    name: 'Destroy VPC Peering'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: setup-tools
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from AWS account (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION  )
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region:            ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+        echo TF_VAR_vpc_type=$VPC_TYPE_STANDARD >> $GITHUB_ENV
+        echo TF_VAR_vpc_name=$TF_VAR_vpc_name_cicd >> $GITHUB_ENV
+        echo TF_VAR_vpc_cidr=$TF_VAR_vpc_cicd_cidr >> $GITHUB_ENV
+        echo TF_VAR_vpc_public_subnets=$TF_VAR_vpc_cicd_public_subnets >> $GITHUB_ENV
+        echo TF_VAR_vpc_private_subnets=$TF_VAR_vpc_cicd_private_subnets >> $GITHUB_ENV
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Destroy
+      run: |
+        cd ./modules/vpc-peering && terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-vpc-peering-${TF_VAR_origin_vpc_name}-${TF_VAR_destination_vpc_name}.tfstate"
+        terraform refresh && terraform plan -destroy && terraform destroy -auto-approve
+
+
+  destroy-vpc-cicd:
+    name: 'Destroy CICD VPC'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [setup-tools,destroy-vpc-peering]
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from AWS account (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION  )
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region:            ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+        echo TF_VAR_vpc_type=$VPC_TYPE_STANDARD >> $GITHUB_ENV
+        echo TF_VAR_vpc_name=$TF_VAR_vpc_name_cicd >> $GITHUB_ENV
+        echo TF_VAR_vpc_cidr=$TF_VAR_vpc_cicd_cidr >> $GITHUB_ENV
+        echo TF_VAR_vpc_public_subnets=$TF_VAR_vpc_cicd_public_subnets >> $GITHUB_ENV
+        echo TF_VAR_vpc_private_subnets=$TF_VAR_vpc_cicd_private_subnets >> $GITHUB_ENV
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Destroy
+      run: |
+        cd ./modules/vpc && terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-vpc-${TF_VAR_vpc_name}.tfstate"
+        terraform refresh && terraform plan -destroy && terraform destroy -auto-approve 
+
+
+  destroy-vpc:
+    name: 'Destroy EKS VPC'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [setup-tools, destroy-vpc-peering, destroy-vpc-endpoint, destroy-eks-cluster]
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from AWS account (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION  )
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region:            ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+        echo TF_VAR_vpc_type=$VPC_TYPE_PRIVATE >> $GITHUB_ENV
+
+    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
+    - name: Terraform Destroy
+      run: |
+        cd ./modules/vpc-advanced && terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-vpc-${TF_VAR_vpc_name}.tfstate"
+        terraform refresh && terraform plan -destroy && terraform destroy -auto-approve 
+ 
+
+  destroy-s3-bucket:
+    name: 'Destroy S3 State'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [setup-tools, destroy-vpc, destroy-vpc-cicd]
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from AWS account (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION  )
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region:            ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+        echo TF_VAR_vpc_type=$VPC_TYPE_PRIVATE >> $GITHUB_ENV
+
+    - name: Cleanup S3
+      run: chmod +x ./scripts/cleanup-s3-bucket.sh && ./scripts/cleanup-s3-bucket.sh

@@ -17,3 +17,11 @@ tf-apply-eks:
 .PHONY: tf-destroy-eks
 tf-destroy-test:
 	terraform init -backend-config ./environment/dev/backend.conf -reconfigure source && terraform validate && terraform destroy -var-file ./environment/dev/base.tfvars source -auto-approve source
+
+.PHONY: tf-fmt
+fmt:
+	for i in $$(find . -name \*.tf | grep -v ".terraform"); do terraform fmt -write=true $$i; done
+
+.PHONY: tf-sec
+tfsec:
+	tfsec .

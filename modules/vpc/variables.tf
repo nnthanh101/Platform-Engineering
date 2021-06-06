@@ -27,12 +27,12 @@ variable "vpc_cidr" {
 }
 
 variable "vpc_private_subnets" {
-  type = list
+  type    = list(any)
   default = []
 }
 
 variable "vpc_public_subnets" {
-  type = list
+  type    = list(any)
   default = []
 }
 
@@ -63,3 +63,9 @@ variable "vpc_type" {
 # variable "key_pair_public_key" {
 #   default = ""
 # }
+
+variable "tags" {
+  description = "A map of tags"
+  type        = map(string)
+  default     = {}
+}

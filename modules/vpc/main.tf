@@ -1,11 +1,11 @@
 terraform {
   backend "s3" {
-    region = var.region 
+    region = var.region
   }
 }
 
 provider "aws" {
-  region  = var.region
+  region = var.region
 }
 
 data "aws_availability_zones" "available" {
@@ -15,7 +15,7 @@ data "aws_availability_zones" "available" {
 module "vpc" {
   ## https://registry.terraform.io/modules/terraform-aws-modules/vpc/aws/latest
   source  = "terraform-aws-modules/vpc/aws"
-  version = "2.78.0"
+  version = "3.0.0"
   name    = var.vpc_name
   cidr    = var.vpc_cidr
 
@@ -27,19 +27,12 @@ module "vpc" {
   enable_dns_support   = true
   enable_nat_gateway   = var.vpc_enable_nat_gateway
   #  enable_vpn_gateway   = var.vpc_enable_vpn_gateway
-  single_nat_gateway   = var.vpc_single_nat_gateway
+  single_nat_gateway = var.vpc_single_nat_gateway
 
-  enable_s3_endpoint   = var.enable_s3_endpoint
-
-  tags = {
-    ProjectID   = var.PROJECT_ID
-    org         = var.org
-    tenant      = var.tenant
-    environment = var.environment
-    VPCType     = var.vpc_type
-  }
-  
-  vpc_endpoint_tags = {
-    Endpoint  = "true"
-  }
+  tags = merge(
+    var.tags,
+    tomap(
+      { "VPCType" = var.vpc_type }
+    )
+  )
 }

@@ -12,7 +12,7 @@ module "s3_bucket" {
   force_destroy = true
 
   tags = {
-    ProjectID   = var.PROJECT_ID
-    Name        = "vpc-flow-logs-s3-bucket"
+    ProjectID = var.PROJECT_ID
+    Name      = "vpc-flow-logs-s3-bucket"
   }
 }

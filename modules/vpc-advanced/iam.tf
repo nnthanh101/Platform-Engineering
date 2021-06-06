@@ -2,7 +2,7 @@
 # IAM Role
 ###########
 resource "aws_iam_role" "vpc_flow_log_cloudwatch" {
-  count = local.flow_log_to_s3 ? 0 : 1
+  count              = local.flow_log_to_s3 ? 0 : 1
   name_prefix        = "${var.PROJECT_ID}-vpc-flow-log-role-"
   assume_role_policy = data.aws_iam_policy_document.flow_log_cloudwatch_assume_role.json
 }
@@ -21,9 +21,9 @@ data "aws_iam_policy_document" "flow_log_cloudwatch_assume_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "vpc_flow_log_cloudwatch" {
-  count       = local.flow_log_to_s3 ? 0 : 1
-  role        = aws_iam_role.vpc_flow_log_cloudwatch[0].name
-  policy_arn  = aws_iam_policy.vpc_flow_log_cloudwatch[0].arn
+  count      = local.flow_log_to_s3 ? 0 : 1
+  role       = aws_iam_role.vpc_flow_log_cloudwatch[0].name
+  policy_arn = aws_iam_policy.vpc_flow_log_cloudwatch[0].arn
 }
 
 resource "aws_iam_policy" "vpc_flow_log_cloudwatch" {
@@ -34,9 +34,9 @@ resource "aws_iam_policy" "vpc_flow_log_cloudwatch" {
 
 data "aws_iam_policy_document" "vpc_flow_log_cloudwatch" {
   statement {
-    sid     = "AWSVPCFlowLogsPushToCloudWatch"
+    sid = "AWSVPCFlowLogsPushToCloudWatch"
 
-    effect  = "Allow"
+    effect = "Allow"
 
     actions = [
       "logs:CreateLogGroup",
@@ -59,7 +59,7 @@ data "aws_iam_policy_document" "flow_log_s3" {
       identifiers = ["delivery.logs.amazonaws.com"]
     }
 
-    effect  = "Allow"
+    effect = "Allow"
 
     actions = [
       "s3:PutObject",
@@ -76,7 +76,7 @@ data "aws_iam_policy_document" "flow_log_s3" {
       identifiers = ["delivery.logs.amazonaws.com"]
     }
 
-    effect  = "Allow"
+    effect = "Allow"
 
     actions = [
       "s3:GetBucketAcl",

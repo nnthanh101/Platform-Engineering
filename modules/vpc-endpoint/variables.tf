@@ -1,3 +1,19 @@
+variable "PROJECT_ID" {
+  default = ""
+}
+
+variable "org" {
+  default = ""
+}
+
+variable "tenant" {
+  default = ""
+}
+
+variable "environment" {
+  default = ""
+}
+
 variable "vpc_name" {
   default = ""
 }
@@ -116,7 +132,8 @@ variable "vpc_endpoint_services_gateway" {
   type        = list(string)
   description = "List of AWS Endpoint service names that are used to create VPC Interface Endpoints Type=Gateway"
   default = [
-    "dynamodb"
+    # "dynamodb",
+    # "s3"
   ]
 }
 
@@ -124,14 +141,29 @@ variable "vpc_endpoint_services_interface" {
   type        = list(string)
   description = "List of AWS Endpoint service names that are used to create VPC Interface Endpoints Type=Interface"
   default = [
-    "s3"
+    # "s3",
+    # "ec2",
+    # "ebs",
+    # "ssm",
+    # "imagebuilder",
+    # "ssmmessages",
+    # "ec2messages",
+    # "autoscaling",
+    # "logs",
+    # "elasticloadbalancing",
+    # "kms",
+    # "sqs",
+    # "sns",
+    # "ecr.api",
+    # "ecr.dkr",
+    # "sts"
   ]
 }
 # ---------------------------------------------------------------------------------------------------------------------
 # AWS Tags
 # ---------------------------------------------------------------------------------------------------------------------
 variable "tags" {
-  description = "A map of tags to add to the VPC Endpoint and to the SecurityGroup(s)."
+  description = "A map of tags"
   type        = map(string)
   default     = {}
 }

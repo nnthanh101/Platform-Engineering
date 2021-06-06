@@ -51,10 +51,17 @@ variable "vpc_type" {
   default = ""
 }
 
-# variable "terraform_modules_vpc_version" {
-#   default = ""
-# }
-
 # variable "key_pair_public_key" {
 #   default = ""
 # }
+
+
+variable "eks_cluster_name" {
+  default = ""
+}
+
+variable "tags" {
+  description = "A map of tags"
+  type        = map(string)
+  default     = {}
+}
