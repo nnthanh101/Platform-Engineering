@@ -19,7 +19,7 @@ _logger "[+] 1.1. Installing Utilities: jq, wget, unzip ..."
 echo "#########################################################"
 sudo yum -y update
 sudo yum -y upgrade
-sudo yum install -y jq gettext bash-completion wget unzip moreutils nmap bind-utils
+sudo yum install -y jq gettext bash-completion wget unzip moreutils nmap bind-utils amazon-efs-utils
 
 # echo "[+] AMZ-Linux2/CenOS EBS Extending a Partition on a T2/T3 Instance"
 # sudo growpart /dev/nvme0n1 1
@@ -198,7 +198,7 @@ echo "[x] Verify Maven":             $(mvn --version)
 
 
 echo "Verify the binaries are in the path and executable!"
-for command in aws terraform kubectl eksctl helm wget jq envsubst
+for command in aws terraform kubectl eksctl helm wget jq envsubst amazon-efs-utils
   do
     which $command &>/dev/null && echo "[x] $command in path" || echo "[ ] $command NOT FOUND"
   done
