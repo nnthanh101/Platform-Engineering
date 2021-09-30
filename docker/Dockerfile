@@ -8,7 +8,7 @@ LABEL description="Cross-Platform bootstrapping to deploy Terraform execution en
 ## [Packer 1.7.2]https://github.com/hashicorp/packer/releases
 ## [helmmans 3.6.7](https://github.com/Praqma/helmsman/releases)
 ## [aws-iam-authenticator 1.19.6/2021-01-05](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html)
-ARG TERRAFORM_VERSION=0.14.10
+ARG TERRAFORM_VERSION=0.15.0
 ARG PACKER_VERSION=1.7.2
 ARG HELMSMAN_VERSION=3.6.7
 ARG AWS_IAM_AUTH_VERSION=1.19.6/2021-01-05
