@@ -3,10 +3,10 @@ name: Terraform-for-AppRunner_test
 ## Controls when the action will run.
 on:
   workflow_run:
-    workflows: ["TF-Init-State"]
+    workflows: ["tf-init-state"]
     branches:
-    - feature/*
-    - main
+    - feature/AppRunner
+    # - main
     types: 
       - completed
 

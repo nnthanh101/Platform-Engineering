@@ -1,5 +1,5 @@
 ## Initial-for-Terraform-State 
-name: TF-Init-State
+name: tf-init-state
 
 ## Controls when the action will run.
 on:
@@ -23,7 +23,7 @@ env:
 jobs:
 
   setup-tools:
-    name: 'Setup tools: Terraform, AWS CLI ...'
+    name: 'Install Utils: Terraform, AWS CLI ...'
     runs-on: ubuntu-latest
     environment: test
     # if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
@@ -46,7 +46,7 @@ jobs:
         retention-days: 1
 
   setup-s3:
-    name: 'Setup S3 bucket & DynamoDB: https://eks.job4u.vn/en/eks/init-tf.html'
+    name: 'Initial for TF-State: S3 & DynamoDB: https://eks.job4u.vn/en/eks/init-tf.html'
     runs-on: ubuntu-latest
     environment: test
     # if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
