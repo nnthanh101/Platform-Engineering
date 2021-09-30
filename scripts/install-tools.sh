@@ -47,9 +47,9 @@ else
     brew install weaveworks/tap/eksctl
 fi
 
-# Install terraform 0.15.0
-cd ~
-version=0.15.0
+# Install terraform 1.0.8
+# cd ~
+version=1.0.8
 # version=$(curl https://api.github.com/repos/hashicorp/terraform/releases/latest --silent | jq ".tag_name" -r)
 # version=$(echo $version | sed 's/v//g') # get rid of 'v' from version number
 echo "Installing Terraform $version."
@@ -61,8 +61,9 @@ sudo mv terraform /usr/local/bin/
 echo "Terraform $version installed."
 rm "terraform_amd64.zip"
 echo "Install terraform*.zip file cleaned up."
+terraform version
 
-# Install helm
+## Install helm
 # curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
 # chmod 700 get_helm.sh
 # ./get_helm.sh
