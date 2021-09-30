@@ -10,6 +10,12 @@ function _logger() {
 }
 
 source .env
+param=${1:--env=dev}
+parsed=(${param//=/ })
+env=$(echo ${parsed[1]})
+env=${env:-dev}
+TF_ENV="./environment/$env"
+source ${TF_ENV}/.env
 
 aws sts get-caller-identity && sleep 1
 started_time=$(date '+%d/%m/%Y %H:%M:%S')
@@ -32,17 +38,17 @@ case $vpc_type in
     "$VPC_TYPE_STANDARD")
         echo "Destroying $vpc_type..."
         export TF_VAR_vpc_type=$VPC_TYPE_STANDARD
-        cd ${WORKING_DIR}/terraform/stacks/vpc
+        cd ${WORKING_DIR}/modules/vpc
         ;;
     "$VPC_TYPE_PRIVATE")
         echo "Destroying $vpc_type..."
         export TF_VAR_vpc_type=$VPC_TYPE_PRIVATE
-        cd ${WORKING_DIR}/terraform/stacks/vpc-private
+        cd ${WORKING_DIR}/modules/vpc-private
         ;;
     "$VPC_TYPE_ADVANCED")
         echo "Destroying $vpc_type..."
         export TF_VAR_vpc_type=$VPC_TYPE_ADVANCED
-        cd ${WORKING_DIR}/terraform/stacks/vpc-advanced
+        cd ${WORKING_DIR}/modules/vpc-advanced
         ;;
 esac
 

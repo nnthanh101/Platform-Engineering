@@ -1,0 +1,585 @@
+name: 'Terraform'
+
+on:
+  push:
+    branches:
+    - terraform
+    - terraform-**
+    - EKS
+  pull_request:
+
+jobs:
+  setup-tools:
+    name: 'Setup tools'
+    runs-on: ubuntu-latest
+    environment: dev
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
+    - name: Setup tools
+      run: ./scripts/install-tools.sh 
+
+  setup-s3:
+    name: 'Setup S3 bucket'
+    runs-on: ubuntu-latest
+    environment: dev
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from AWS account (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION  )
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region:            ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+        echo TF_VAR_vpc_type=$VPC_TYPE_PRIVATE >> $GITHUB_ENV
+
+    - name: Setup S3 bucket
+      run: |
+        aws s3api create-bucket --bucket ${TF_STATE_S3_BUCKET} --region ${AWS_REGION} --create-bucket-configuration LocationConstraint=${AWS_REGION} 2>/dev/null || true
+        aws s3api put-bucket-versioning --bucket ${TF_STATE_S3_BUCKET} --versioning-configuration Status=Enabled 2>/dev/null || true
+        aws s3api list-buckets
+
+  
+  vpc:
+    name: 'EKS-VPC'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [setup-tools, setup-s3]
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from AWS account (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION  )
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region:            ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+        echo TF_VAR_vpc_type=$VPC_TYPE_PRIVATE >> $GITHUB_ENV
+
+    - name: Terraform Apply
+      uses: ./.github/actions/apply
+      with:
+        dir: ./modules/vpc-advanced
+        key: ${PROJECT_ID}-vpc-${TF_VAR_vpc_name}
+
+    - name: Archive tfplan
+      uses: actions/upload-artifact@v2
+      with:
+        name: vpc-eks-tfplan
+        path: ./modules/vpc-advanced/tfplan
+
+  
+  vpc-endpoint:
+    name: 'VPC Endpoints'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [setup-tools, setup-s3, vpc]
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials from Test account
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region:            ${{ secrets.AWS_REGION }}
+    
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+        echo TF_VAR_vpc_type=$VPC_TYPE_PRIVATE >> $GITHUB_ENV
+
+    - name: Terraform Apply
+      uses: ./.github/actions/apply
+      with:
+        dir: ./modules/vpc-endpoint
+        key: ${PROJECT_ID}-vpc-endpoint
+
+    - name: Archive tfplan
+      uses: actions/upload-artifact@v2
+      with:
+        name: vpc-endpoint-tfplan
+        path: ./modules/vpc-endpoint/tfplan
+  
+
+  vpc-cicd:
+    name: 'CI/CD VPC'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [setup-tools, setup-s3]
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from Test account
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+        echo TF_VAR_vpc_type=$VPC_TYPE_STANDARD >> $GITHUB_ENV
+        echo TF_VAR_vpc_name=$TF_VAR_vpc_name_cicd >> $GITHUB_ENV
+        echo TF_VAR_vpc_cidr=$TF_VAR_vpc_cicd_cidr >> $GITHUB_ENV
+        echo TF_VAR_vpc_public_subnets=$TF_VAR_vpc_cicd_public_subnets >> $GITHUB_ENV
+        echo TF_VAR_vpc_private_subnets=$TF_VAR_vpc_cicd_private_subnets >> $GITHUB_ENV
+
+    - name: Terraform Apply
+      uses: ./.github/actions/apply
+      with:
+        dir: ./modules/vpc
+        key: ${PROJECT_ID}-vpc-${TF_VAR_vpc_name}
+
+    - name: Archive tfplan
+      uses: actions/upload-artifact@v2
+      with:
+        name: vpc-cicd-tfplan
+        path: ./modules/vpc/tfplan
+  
+
+  vpc-peering:
+    name: 'VPC Peering'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [setup-tools, setup-s3, vpc, vpc-cicd]
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from Test account
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+
+    - name: Terraform Apply
+      uses: ./.github/actions/apply
+      with:
+        dir: ./modules/vpc-peering
+        key: ${PROJECT_ID}-vpc-peering-${TF_VAR_origin_vpc_name}-${TF_VAR_destination_vpc_name}
+
+    - name: Archive tfplan
+      uses: actions/upload-artifact@v2
+      with:
+        name: vpc-peering-tfplan
+        path: ./modules/vpc-peering/tfplan
+  
+
+  ec2-image-builder:
+    name: 'EC2 Image Builder'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [setup-tools, setup-s3, vpc]
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from Test account
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+        echo TF_VAR_ec2_image_builder_component_file=../../environment/dev/ec2-component.yml >> $GITHUB_ENV
+
+    - name: Terraform Apply
+      uses: ./.github/actions/apply
+      with:
+        dir: ./modules/ec2-image-builder
+        key: ${PROJECT_ID}-ec2-image-builder
+
+    - name: Archive tfplan
+      uses: actions/upload-artifact@v2
+      with:
+        name: vpc-ec2-image-builder-tfplan
+        path: ./modules/ec2-image-builder/tfplan
+  
+  eks-cluster:
+    name: 'EKS Cluster'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [setup-tools, setup-s3, vpc]
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from Test account
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+
+    - name: Terraform Apply
+      uses: ./.github/actions/apply
+      with:
+        dir: ./modules/eks-cluster
+        key: ${PROJECT_ID}-eks-cluster
+
+    - name: Archive tfplan
+      uses: actions/upload-artifact@v2
+      with:
+        name: eks-cluster-tfplan
+        path: ./modules/eks-cluster/tfplan
+  
+  efs:
+    name: 'EFS'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [setup-tools, setup-s3, eks-cluster]
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from Test account
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+
+    - name: Terraform Apply
+      uses: ./.github/actions/apply
+      with:
+        dir: ./modules/efs
+        key: ${PROJECT_ID}-efs-${TF_VAR_vpc_name}
+
+    - name: Archive tfplan
+      uses: actions/upload-artifact@v2
+      with:
+        name: vpc-efs-tfplan
+        path: ./modules/efs/tfplan
+  
+  metrics-server:
+    name: 'Metrics Server'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [setup-tools, setup-s3, eks-cluster]
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from Test account
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+
+    - name: Terraform Apply
+      uses: ./.github/actions/apply
+      with:
+        dir: ./modules/metrics-server
+        key: ${PROJECT_ID}-metrics-server
+
+    - name: Archive tfplan
+      uses: actions/upload-artifact@v2
+      with:
+        name: eks-metrics-server-tfplan
+        path: ./modules/metrics-server/tfplan
+  
+  cluster-autoscaler:
+    name: 'Cluster Autoscaler'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [setup-tools, setup-s3, eks-cluster]
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from Test account
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+
+    - name: Terraform Apply
+      uses: ./.github/actions/apply
+      with:
+        dir: ./modules/autoscaler
+        key: ${PROJECT_ID}-cluster-autoscaler
+
+    - name: Archive tfplan
+      uses: actions/upload-artifact@v2
+      with:
+        name: eks-cluster-autoscaler-tfplan
+        path: ./modules/autoscaler/tfplan
+  
+  node-termination-hanlder:
+    name: 'Node Termination Hanlder'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [setup-tools, setup-s3, eks-cluster]
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from Test account
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+
+    - name: Terraform Apply
+      uses: ./.github/actions/apply
+      with:
+        dir: ./modules/node-termination-handler
+        key: ${PROJECT_ID}-node-termination-handler
+
+    - name: Archive tfplan
+      uses: actions/upload-artifact@v2
+      with:
+        name: eks-node-termination-handler-tfplan
+        path: ./modules/node-termination-handler/tfplan
+  
+  
+  alb:
+    name: 'ALB'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [setup-tools, setup-s3, eks-cluster]
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from Test account
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+
+    - name: Apply pre-configure
+      run: |
+        aws eks update-kubeconfig --name $TF_VAR_eks_cluster_name 
+        kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master"
+
+    - name: Terraform Apply
+      uses: ./.github/actions/apply
+      with:
+        dir: ./modules/alb
+        key: ${PROJECT_ID}-alb
+
+    - name: Archive tfplan
+      uses: actions/upload-artifact@v2
+      with:
+        name: eks-alb-tfplan
+        path: ./modules/alb/tfplan
+  
+  nlb:
+    name: 'NLB'
+    runs-on: ubuntu-latest
+    environment: dev
+    needs: [setup-tools, setup-s3, eks-cluster]
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from Test account
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/dev/.env && env >> $GITHUB_ENV
+
+    - name: Terraform Apply
+      uses: ./.github/actions/apply
+      with:
+        dir: ./modules/nlb
+        key: ${PROJECT_ID}-nlb
+
+    - name: Archive tfplan
+      uses: actions/upload-artifact@v2
+      with:
+        name: eks-nlb-tfplan
+        path: ./modules/nlb/tfplan
+  
+  # gitlab:
+  #   name: 'Gitlab'
+  #   runs-on: ubuntu-latest
+  #   environment: dev
+  #   needs: [setup-tools, setup-s3, eks-cluster, alb]
+
+  #   # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+  #   defaults:
+  #     run:
+  #       shell: bash
+
+  #   steps:
+  #   - name: Checkout
+  #     uses: actions/checkout@v2
+   
+  #   - name: Configure AWS credentials from Test account
+  #     uses: aws-actions/configure-aws-credentials@v1
+  #     with:
+  #       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #       aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+  #       aws-region: ${{ secrets.AWS_REGION }}
+
+  #   - name: Setup enviroment variables
+  #     run: |
+  #       source ./environment/dev/.env && env >> $GITHUB_ENV
+
+  #   - name: Terraform Apply
+  #     uses: ./.github/actions/apply
+  #     with:
+  #       dir: ./modules/workloads/gitlab
+  #       key: ${PROJECT_ID}-gitlab
+
+  #   - name: Archive tfplan
+  #     uses: actions/upload-artifact@v2
+  #     with:
+  #       name: eks-gitlab-tfplan
+  #       path: ./modules/workloads/gitlab/tfplan

@@ -2,6 +2,18 @@ variable "PROJECT_ID" {
   default = ""
 }
 
+variable "org" {
+  default = ""
+}
+
+variable "tenant" {
+  default = ""
+}
+
+variable "environment" {
+  default = ""
+}
+
 variable "region" {
   default = "ap-southeast-1"
 }
@@ -15,7 +27,7 @@ variable "vpc_cidr" {
 }
 
 variable "vpc_private_subnets" {
-  type = list
+  type    = list(any)
   default = []
 }
 
@@ -39,10 +51,17 @@ variable "vpc_type" {
   default = ""
 }
 
-# variable "terraform_modules_vpc_version" {
-#   default = ""
-# }
-
 # variable "key_pair_public_key" {
 #   default = ""
 # }
+
+
+variable "eks_cluster_name" {
+  default = ""
+}
+
+variable "tags" {
+  description = "A map of tags"
+  type        = map(string)
+  default     = {}
+}

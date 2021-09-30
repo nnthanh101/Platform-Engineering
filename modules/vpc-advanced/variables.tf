@@ -2,6 +2,18 @@ variable "PROJECT_ID" {
   default = ""
 }
 
+variable "org" {
+  default = ""
+}
+
+variable "tenant" {
+  default = ""
+}
+
+variable "environment" {
+  default = ""
+}
+
 variable "region" {
   default = "ap-southeast-1"
 }
@@ -19,25 +31,25 @@ variable "vpc_cidr" {
 }
 
 variable "vpc_private_subnets" {
-  type = list
+  type    = list(any)
   default = []
 }
 
 variable "vpc_public_subnets" {
-  type = list
+  type    = list(any)
   default = []
 }
 
 variable "vpc_database_subnets" {
-  type = list
+  type    = list(any)
   default = []
 }
 
 variable "vpc_elasticache_subnets" {
-  type = list
+  type    = list(any)
   default = []
 }
-  
+
 variable "vpc_create_db_subnet_route_table" {
   default = true
 }
@@ -88,3 +100,12 @@ variable "vpc_fl_max_agg_interval" {
   default = 60
 }
 
+variable "eks_cluster_name" {
+  default = ""
+}
+
+variable "tags" {
+  description = "A map of tags"
+  type        = map(string)
+  default     = {}
+}

@@ -1,9 +1,21 @@
+variable "org" {
+  default = ""
+}
+
+variable "tenant" {
+  default = ""
+}
+
+variable "environment" {
+  default = ""
+}
+
 variable "aws_account_id" {
   default = ""
 }
 
 variable "PROJECT_ID" {
-  
+  default = ""
 }
 
 variable "region" {
@@ -11,9 +23,15 @@ variable "region" {
 }
 
 variable "origin_vpc_name" {
-  default = ""
+  default = "EKS-VPC"
 }
 
 variable "destination_vpc_name" {
-  default = ""
+  default = "CICD-VPC"
+}
+
+variable "tags" {
+  description = "A map of tags"
+  type        = map(string)
+  default     = {}
 }

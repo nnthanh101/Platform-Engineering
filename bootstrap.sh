@@ -9,7 +9,13 @@ function _logger() {
     echo -e "$(date) ${YELLOW}[*] $@ ${NC}"
 }
 
-source .env
+source ./.env
+param=${1:--env=dev}
+parsed=(${param//=/ })
+env=$(echo ${parsed[1]})
+env=${env:-dev}
+TF_ENV="./environment/$env"
+source ${TF_ENV}/.env
 
 echo
 echo "#########################################################"
@@ -20,6 +26,7 @@ kubectl version --short --client
 helm version
 echo $(aws sts get-caller-identity)
 
+
 started_time=$(date '+%d/%m/%Y %H:%M:%S')
 echo
 echo "#########################################################"
@@ -27,24 +34,11 @@ echo "Infrastructure Provisioning started at ${started_time}"
 echo "#########################################################"
 echo
 
-## Create S3 Bucket with Versioning Enabled to store Terraform State
 echo
 echo "#########################################################"
-_logger "[+] 1. Initial setup S3-bucket & DynamoDB-tables for Terraform State files & locks"
-echo "### Creates a s3 bucket for Terraform files..."
-echo "### Creates the DynamoDB tables for Terraform locks"
-echo "### Runs the the gen-backend.sh script from a Terraform null resource' "
-_logger "[+] 1. Creating S3 Bucket with Versioning Enabled to store Terraform State."
+_logger "[+] 1. Create S3 Bucket with Versioning Enabled to store Terraform State files & locks ..."
 echo "#########################################################"
 echo
-# aws sts get-caller-identity
-
-# TF_STACK="tf-state-aws"
-# cd  ${WORKING_DIR}/modules/${TF_STACK} &&  \
-#     terraform init             &&  \
-#     terraform validate         &&  \
-#     terraform plan -out tfplan &&  \
-#     terraform apply -input=false -auto-approve tfplan
 
 echo "TF_STATE_S3_BUCKET=${TF_STATE_S3_BUCKET} + AWS_REGION=${AWS_REGION}"
 ## Note: us-east-1 does not require a `location-constraint`:
@@ -67,16 +61,19 @@ do
     case $REPLY in
         1)
         echo "Provisioning $opt..."
+        # export TF_VAR_vpc_name="CICD-VPC"
         export TF_VAR_vpc_type=$VPC_TYPE_STANDARD
         cd ${WORKING_DIR}/modules/vpc
         ;;
         2)
         echo "Provisioning $opt..."
+        # export TF_VAR_vpc_name="EKS-VPC"
         export TF_VAR_vpc_type=$VPC_TYPE_PRIVATE
         cd ${WORKING_DIR}/modules/vpc-private
         ;;
         3)
         echo "Provisioning $opt..."
+        # export TF_VAR_vpc_name="EKS-Prod-VPC"
         export TF_VAR_vpc_type=$VPC_TYPE_ADVANCED
         cd ${WORKING_DIR}/modules/vpc-advanced
         ;;
@@ -89,56 +86,124 @@ do
     esac
     break
 done
+
 terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-vpc-stack.tfstate" && \
-terraform plan -out ${PROJECT_ID}.vpc.tfplan && \
-terraform apply -input=false -auto-approve ${PROJECT_ID}.vpc.tfplan
-
-## FIXME1 VPC-Endpoints
-# echo
-# echo "#########################################################"
-# _logger "[+] 2.2. VPC Interface/Gateway Endpoints: teraform/stacks/XXX/terraform.tfvars"
-# echo "#########################################################"
-# echo
-
-## FIXME2 VPC-Peering
-# echo
-# echo "#########################################################"
-# _logger "[+] 2.3. VPC Peering: teraform/stacks/vpc-peering/terraform.tfvars"
-# echo " [DevTest]      AWS-Account1-VPC1: CI/CD Pipeline - Code*, Jenkins, GitLab
-# echo " [Staging/Prod] AWS-Account2-VPC2: EKS Cluster Staging/Prod
-# echo "#########################################################"
-# echo
-
-# cd  ${WORKING_DIR}/modules/vpc-peering &&           \
-#     terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-vpc-peering-stack.tfstate"
-#     terraform plan -out ${PROJECT_ID}.vpc-peering.tfplan &&  \
-#     terraform apply -input=false -auto-approve ${PROJECT_ID}.vpc-peering.tfplan
+terraform plan -out tfplan && \
+# terraform show tfplan && \
+terraform apply -input=false -auto-approve tfplan
 
 
-## FIXME3 EFS
-# echo
-# echo "#########################################################"
-# _logger "[+] 2.4. Provisioning EFS Stack: teraform/stacks/efs/terraform.tfvars"
-# echo "#########################################################"
-# echo
+echo
+echo "#########################################################"
+_logger "[+] 2.2. VPC Interface/Gateway Endpoints"
+echo "#########################################################"
+echo
+cd ${WORKING_DIR}/modules/vpc-endpoint
+terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-vpc-endpoint.tfstate" && \
+terraform plan -out tfplan && \
+# terraform show tfplan && \
+terraform apply -input=false -auto-approve tfplan
 
-# cd  ${WORKING_DIR}/modules/efs &&           \
-#     terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-efs-stack.tfstate"
-#     terraform plan -out ${PROJECT_ID}.efs.tfplan &&  \
-#     terraform apply -input=false -auto-approve ${PROJECT_ID}.efs.tfplan
+
+echo
+echo "#########################################################"
+_logger "[+] 2.3. VPC Peering: modules/vpc-peering"
+echo " [DevTest]      AWS-Account1-VPC1: CI/CD Pipeline - Code*, Jenkins, GitLab
+echo " [Staging/Prod] AWS-Account2-VPC2: EKS Cluster Staging/Prod
+echo "#########################################################"
+echo
+
+cd  ${WORKING_DIR}/modules/vpc-peering &&           \
+    terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-vpc-peering.tfstate"
+    terraform plan -out tfplan &&  \
+    terraform apply -input=false -auto-approve tfplan
 
 
-## FIXME4 EC2-Image-Builder
-# echo
-# echo "#########################################################"
-# _logger "[+] 2.5. AWS EC2 Image Builder Pipeline: teraform/stacks/ec2-image-builder/terraform.tfvars"
-# echo "#########################################################"
-# echo
+echo
+echo "#########################################################"
+_logger "[+] 2.4. Provisioning EFS Stack: teraform/stacks/efs/terraform.tfvars"
+echo "#########################################################"
+echo
 
-# cd  ${WORKING_DIR}/modules/ec2-image-builder &&           \
-#     terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-ec2-image-builder-stack.tfstate"
-#     terraform plan -out ${PROJECT_ID}.ec2-image-builder.tfplan &&  \
-#     terraform apply -input=false -auto-approve ${PROJECT_ID}.ec2-image-builder.tfplan
+cd  ${WORKING_DIR}/modules/efs &&           \
+    terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-efs-${TF_VAR_vpc_name}.tfstate"
+    terraform plan -out tfplan &&  \
+    terraform apply -input=false -auto-approve tfplan
+
+
+echo
+echo "#########################################################"
+_logger "[+] 2.5. AWS EC2 Image Builder Pipeline: teraform/stacks/ec2-image-builder/terraform.tfvars"
+echo "#########################################################"
+echo
+
+export TF_VAR_ec2_image_builder_component_file="../../environment/$env/ec2-component.yml"
+
+cd  ${WORKING_DIR}/modules/ec2-image-builder &&           \
+    terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-ec2-image-builder.tfstate"
+    terraform plan -out tfplan &&  \
+    terraform apply -input=false -auto-approve tfplan
+
+echo
+echo "#########################################################"
+_logger "[+] 3. AWS EKS"
+echo "#########################################################"
+echo
+cd  ${WORKING_DIR}/modules/eks-cluster &&           \
+    terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-eks-cluster.tfstate"
+    terraform plan -out tfplan &&  \
+    terraform apply -input=false -auto-approve tfplan
+
+echo
+echo "#########################################################"
+_logger "[+] 4. Metrics Server"
+echo "#########################################################"
+echo
+cd  ${WORKING_DIR}/modules/metrics-server &&           \
+    terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-metrics-server.tfstate"
+    terraform plan -out tfplan &&  \
+    terraform apply -input=false -auto-approve tfplan
+
+echo
+echo "#########################################################"
+_logger "[+] 5. Cluster Autoscaler"
+echo "#########################################################"
+echo
+cd  ${WORKING_DIR}/modules/autoscaler &&           \
+    terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-cluster-autoscaler.tfstate"
+    terraform plan -out tfplan &&  \
+    terraform apply -input=false -auto-approve tfplan
+
+echo
+echo "#########################################################"
+_logger "[+] 6. Node Termination Handler"
+echo "#########################################################"
+echo
+cd  ${WORKING_DIR}/modules/node-termination-handler &&           \
+    terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-node-termination-handler.tfstate"
+    terraform plan -out tfplan &&  \
+    terraform apply -input=false -auto-approve tfplan
+
+echo
+echo "#########################################################"
+_logger "[+] 7. AWS ALB"
+echo "#########################################################"
+echo
+kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master"
+cd  ${WORKING_DIR}/modules/alb &&           \
+    terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-alb.tfstate"
+    terraform plan -out tfplan &&  \
+    terraform apply -input=false -auto-approve tfplan
+
+echo
+echo "#########################################################"
+_logger "[+] 8. AWS NLB"
+echo "#########################################################"
+echo
+cd  ${WORKING_DIR}/modules/nlb &&           \
+    terraform init -reconfigure -backend-config="region=${AWS_REGION}" -backend-config="bucket=${TF_STATE_S3_BUCKET}" -backend-config="key=${PROJECT_ID}-nlb.tfstate"
+    terraform plan -out tfplan &&  \
+    terraform apply -input=false -auto-approve tfplan
 
 ended_time=$(date '+%d/%m/%Y %H:%M:%S')
 echo
