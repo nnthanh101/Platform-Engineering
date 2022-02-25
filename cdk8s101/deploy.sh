@@ -51,7 +51,7 @@ cdkbootstrap(){
 
 cdk8s(){
   echo "$s 🛠️ CDK8s Synthesize & Deploy ..."
-  npm run synth
+  npm run buildk8s
   kubectl apply -f dist/
   echo "$s 🛠️ Project build completed!"
 }
