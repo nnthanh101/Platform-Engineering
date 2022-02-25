@@ -3,8 +3,11 @@ import * as eks from '@aws-cdk/aws-eks';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as iam from '@aws-cdk/aws-iam';
 
-// const KEYPAIR_NAME = 'cdk8s-key-pair';
-const PROJECT_NAME = 'CDK8s-'
+import * as cdk8s from 'cdk8s'
+import { MyChart } from '../main';
+
+// const KEYPAIR_NAME = 'cdk8s-keypair';
+const PROJECT_NAME = 'CDK8s'
 
 export class Cdk8S101Stack extends cdk.Stack {
   constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -23,7 +26,7 @@ export class Cdk8S101Stack extends cdk.Stack {
       natGateways: 1
     });
 
-    const clusterAdmin = new iam.Role(this, PROJECT_NAME.concat('AdminRole'), {
+    const clusterAdmin = new iam.Role(this, 'AdminRole', {
       assumedBy: new iam.AccountRootPrincipal()
     });
 
@@ -41,7 +44,7 @@ export class Cdk8S101Stack extends cdk.Stack {
     /**
      * Code to add pods on EKS cluster. All containers are defined in MyChart
      */
-    // eksCluster.addCdk8sChart('my-chart', new MyChart(new cdk8s.App(), 'MyChart'));
+    eksCluster.addCdk8sChart('my-chart', new MyChart(new cdk8s.App(), 'MyChart'));
 
     new cdk.CfnOutput(this, 'EksClusterName', {
       value: eksCluster.clusterName,
