@@ -23,11 +23,11 @@ export class MyChart extends Chart {
     const APPLABEL        = 'demo-voting-app'
     const REDISPORT       = 6379;
     const REDISIMAGE      = 'redis'
-    const REDISSVCNAME    = 'redis';
+    // const REDISSVCNAME    = 'redis';
 
     const POSTGRESPORT    = 5432;
     const POSTGRESIMAGE   = 'postgres';
-    const POSTGRESSVCNAME = 'db';
+    // const POSTGRESSVCNAME = 'db';
 
     const VOTINGAPPPORT  = 80;
     const RESULTAPPPORT  = 80;
@@ -92,7 +92,8 @@ export class MyChart extends Chart {
     const workappcontainer = new kplus.Container({
       image: WORKEAPPIMAGE,
     })
-    const workerappdeploy = this.createCdk8sDeploymment(this, APPLABEL, "workerappdeploy",workappcontainer, POD_INSTANCES)
+    // const workerappdeploy = this.createCdk8sDeploymment(this, APPLABEL, "workerappdeploy",workappcontainer, POD_INSTANCES)
+    this.createCdk8sDeploymment(this, APPLABEL, "workerappdeploy",workappcontainer, POD_INSTANCES)
 
   }
 
