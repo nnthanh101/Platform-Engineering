@@ -44,7 +44,10 @@ cdkbootstrap(){
     echo "Region used for bootstrap $REGION"
   fi
   cdk bootstrap aws://$ACCOUNT/$REGION 
-  echo "$s 🚀 CDK Bootstrap completed!"
+  echo "$s ⚡ CDK Deploy ..."
+  cdk deploy --require-approval never
+  echo "$s ✨ cdk destroy --require-approval never"
+  echo "$s 💯 CDK Bootstrap & Deploy completed!"
 }
 
 if ! [ -x "$(command -v git)" ]; then

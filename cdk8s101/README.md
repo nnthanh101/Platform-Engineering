@@ -14,4 +14,6 @@ npm install -g cdk8s-cli
 ```
 mkdir cdk8s101 && cd cdk8s101
 cdk8s init typescript-app
+
+cdk init app --language typescript
 ```
