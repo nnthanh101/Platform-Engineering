@@ -46,8 +46,14 @@ cdkbootstrap(){
   cdk bootstrap aws://$ACCOUNT/$REGION 
   echo "$s ⚡ CDK Deploy ..."
   cdk deploy --require-approval never
-  echo "$s ✨ cdk destroy --require-approval never"
   echo "$s 💯 CDK Bootstrap & Deploy completed!"
+}
+
+cdk8s(){
+  echo "$s 🛠️ CDK8s Synthesize & Deploy ..."
+  npm run synth
+  kubectl apply -f dist/
+  echo "$s 🛠️ Project build completed!"
 }
 
 if ! [ -x "$(command -v git)" ]; then
@@ -93,4 +99,8 @@ fi
 
 if [ -x "$(command -v cdk)" ]; then  
   cdkbootstrap
+  
+  echo "$s ✨ CDK8s deployment ..."
+  cdk8s
+  echo "$s 💯 CDK8s 💯"
 fi
