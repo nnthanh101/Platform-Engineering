@@ -1,0 +1,102 @@
+## Initial-for-Terraform-State 
+name: tf-init-state
+
+## Controls when the action will run.
+on:
+    ## Triggers the workflow on push or pull request events but only for the main branch
+    push:
+        branches:
+          - feature/*
+          - main
+    pull_request:
+        branches:
+          - feature/*
+          - main
+
+    ## Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
+
+## Initializes environment variables for the workflow
+env:
+  environment: test
+
+jobs:
+
+  setup-tools:
+    name: 'Install Utils: Terraform, AWS CLI ...'
+    runs-on: ubuntu-latest
+    environment: test
+    # if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    - name: Setup tools
+      run: ./scripts/install-tools.sh
+    
+    - name: Upload terraform binary
+      uses: actions/upload-artifact@v2
+      with:
+        name: terraform
+        path: /usr/local/bin/terraform
+        retention-days: 1
+
+  setup-s3:
+    name: 'Initial for TF-State: S3 & DynamoDB: https://eks.job4u.vn/en/eks/init-tf.html'
+    runs-on: ubuntu-latest
+    environment: test
+    # if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+   
+    - name: Configure AWS credentials from AWS account (AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_REGION  )
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token:     ${{ secrets.AWS_SESSION_TOKEN }}
+        aws-region:            ${{ secrets.AWS_REGION }}
+
+    - name: Setup enviroment variables
+      run: |
+        source ./environment/${{ env.environment }}/.env && env >> $GITHUB_ENV
+        echo AWS_REGION=${{ secrets.AWS_REGION }}               >> $GITHUB_ENV
+        echo TF_VAR_region=${{ secrets.AWS_REGION }}            >> $GITHUB_ENV
+
+    - name: Setup S3 bucket
+      run: |
+        aws s3api create-bucket --bucket ${TF_STATE_S3_BUCKET} --region ${AWS_REGION} --create-bucket-configuration LocationConstraint=${AWS_REGION} 2>/dev/null || true
+        aws s3api put-bucket-versioning --bucket ${TF_STATE_S3_BUCKET} --versioning-configuration Status=Enabled 2>/dev/null || true
+        aws s3api list-buckets
+
+    - name: Setup DynamoDB table
+      run: |
+        aws dynamodb create-table --table-name ${TF_STATE_DYNAMODB_TABLE} --key-schema AttributeName=LockID,KeyType=HASH --attribute-definitions AttributeName=LockID,AttributeType=S --provisioned-throughput ReadCapacityUnits=20,WriteCapacityUnits=20 2>/dev/null || true
+
+  terrascan:
+    name: Scan terraform files
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Run Terrascan
+        id: terrascan
+        uses: accurics/terrascan-action@main
+        with:
+          iac_type: 'terraform'
+          iac_version: 'v14'
+          policy_type: 'aws'
+          only_warn: true
+          sarif_upload: true
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: terrascan.sarif
