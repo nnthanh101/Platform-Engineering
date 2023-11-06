@@ -13,10 +13,11 @@ ARG PACKER_VERSION=1.7.2
 ARG HELMSMAN_VERSION=3.6.7
 ARG AWS_IAM_AUTH_VERSION=1.19.6/2021-01-05
 
+ENV LANG=C.UTF-8
 ENV TZ=Asia/Bangkok
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apk --update-cache upgrade && \
-    apk add --update --no-cache bash curl wget unzip git openssl jq docker-cli
+    apk add --update --no-cache bash curl tar gzip bash ca-certificates wget unzip git gawk openssl jq docker-cli
 
 RUN apk --no-cache add \
     binutils \
@@ -52,6 +53,7 @@ RUN curl -LO https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terra
 RUN curl -LO "https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl" && \
         mv kubectl /usr/local/bin/kubectl && \
         chmod +x /usr/local/bin/kubectl
+## CMD [ "kubectl" ]
 
 ## Install Helm3
 RUN curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 && \
