@@ -39,6 +39,7 @@ build() {
   echo "packer version is $packer_version"
 
   echo "docker build ..."
+  # docker build --no-cache --push \
   docker build --no-cache -f ./devcontainer/aws-terraform/Dockerfile \
     --build-arg KUBECTL_VERSION=${tag}                 \
     --build-arg HELM_VERSION=${helm}                   \
