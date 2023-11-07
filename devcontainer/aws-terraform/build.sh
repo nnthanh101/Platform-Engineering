@@ -39,7 +39,7 @@ build() {
   echo "packer version is $packer_version"
 
   echo "docker build ..."
-  docker build --no-cache                              \
+  docker build --no-cache -f devcontainer/aws-terraform/Dockerfile ./devcontainer/aws-terraform \
     --build-arg KUBECTL_VERSION=${tag}                 \
     --build-arg HELM_VERSION=${helm}                   \
     --build-arg KUSTOMIZE_VERSION=${kustomize_version} \
@@ -63,7 +63,7 @@ build() {
   if [[ "$CIRCLE_BRANCH" == "DevContainers" ]]; then
     docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     docker buildx create --use
-    docker buildx build --no-cache --push                \
+    docker buildx build --no-cache --push -f devcontainer/aws-terraform/Dockerfile ./devcontainer/aws-terraform \
       --platform=linux/amd64,linux/arm64                 \
       --build-arg KUBECTL_VERSION=${tag}                 \
       --build-arg HELM_VERSION=${helm}                   \
