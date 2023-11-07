@@ -12,6 +12,11 @@ function _logger() {
 
 # ./cloud9.sh
 
+docker build --tag=buildme .
+docker run --name=buildme --rm --detach buildme
+docker exec -it buildme /bin/client
+docker stop buildme
+
 _logger "[+] ECR_REPO="${CONTAINER_REGISTRY_URL}/${ECR_REPOSITORY}
 ECR_REPO=$(aws ecr describe-repositories | jq -c ".repositories[] | select(.repositoryName | contains(\"${ECR_REPOSITORY}\")) | .repositoryName")
 if [ -z "${ECR_REPO}" ]; then

@@ -1,6 +1,6 @@
 # All-In-One Kubernetes tools (kubectl, helm, iam-authenticator, eksctl, kubeseal, etc)
 
-Kubernetes docker images with necessary tools 
+Alpine docker images with necessary tools for Kubernetes, Terraform, and AWSCLI.
 
 [![DockerHub Badge](http://dockeri.co/image/nnthanh101/k8s)](https://hub.docker.com/r/nnthanh101/k8s/)
 
