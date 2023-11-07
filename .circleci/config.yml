@@ -28,7 +28,7 @@ jobs:
           command: |
             apk --no-cache --update add bash curl sudo
             echo $REBUILD
-            bash ./build.sh
+            bash ./devcontainer/aws-terraform/build.sh
 
   scan:
     docker:
@@ -37,7 +37,7 @@ jobs:
       - checkout
       - run: |
           apk add bash
-          latest_versions=$(bash ./latest_versions.sh)
+          latest_versions=$(bash ./devcontainer/aws-terraform/latest_versions.sh)
           for tag in ${latest_versions}
           do
             echo "Scan image alpine/k8s:${tag} ..."
