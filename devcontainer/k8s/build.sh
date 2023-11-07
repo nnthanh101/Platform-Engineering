@@ -40,7 +40,7 @@ build() {
 
   echo "docker build ..."
   # docker build --no-cache --push \
-  docker build --no-cache -f ./devcontainer/aws-terraform/Dockerfile \
+  docker build --no-cache -f ./devcontainer/k8s/Dockerfile \
     --build-arg KUBECTL_VERSION=${tag}                 \
     --build-arg HELM_VERSION=${helm}                   \
     --build-arg KUSTOMIZE_VERSION=${kustomize_version} \
@@ -64,7 +64,7 @@ build() {
   if [[ "$CIRCLE_BRANCH" == "DevContainers" ]]; then
     docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
     docker buildx create --use
-    docker buildx build --no-cache --push -f ./devcontainer/aws-terraform/Dockerfile \
+    docker buildx build --no-cache --push -f ./devcontainer/k8s/Dockerfile \
       --platform=linux/amd64,linux/arm64                 \
       --build-arg KUBECTL_VERSION=${tag}                 \
       --build-arg HELM_VERSION=${helm}                   \
