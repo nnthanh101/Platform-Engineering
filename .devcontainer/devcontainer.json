@@ -2,13 +2,15 @@
 // For config options: https://github.com/devcontainers/templates/tree/main/src/alpine
 {
 	"name": "DevContainer",
-	"dockerComposeFile": "docker-compose.yml",
-    "service": "devcontainer",
-    "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	// "dockerComposeFile": "docker-compose.yml",
+    // "service": "devcontainer",
+    // "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+
 	// "image": "mcr.microsoft.com/devcontainers/base:alpine-3.18",
 	// "image": "mcr.microsoft.com/devcontainers/base:bookworm",
-	// "image": "mcr.microsoft.com/devcontainers/base:jammy",
+	"image": "mcr.microsoft.com/devcontainers/base:jammy",
 	// "build": {
     //     "dockerfile": "Dockerfile"
     // },
@@ -44,10 +46,8 @@
 		},
 		"ghcr.io/devcontainers/features/aws-cli:1": {
 			"version": "latest"
-		},
-		"ghcr.io/devcontainers-contrib/features/aws-cdk:2": {
-			"version": "latest"
 		}
+		// "ghcr.io/devcontainers-contrib/features/aws-cdk:2": {}
 	},
 	"customizations": {
 		"vscode": {
@@ -62,7 +62,7 @@
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "pip3 install --user -r requirement.txt",
-	"postCreateCommand": "uname -a",
+	"postCreateCommand": "uname -a"
 
 	// Configure tool-specific properties.
 	// "customizations": {},

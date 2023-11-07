@@ -6,7 +6,7 @@ A development container allows you to use a container as a full-featured develop
 
 ### References
 
-* [ ] [alpine-docker/k8s](https://github.com/alpine-docker/k8s)
-* [ ] [Base Development Container Images](https://mcr.microsoft.com/en-us/product/devcontainers/base/tags)
+* [x] [alpine-docker/k8s](https://github.com/alpine-docker/k8s)
+* [x] [Base Development Container Images](https://mcr.microsoft.com/en-us/product/devcontainers/base/tags)
 * [ ] [AWS Terraform Dev Container](https://github.com/awslabs/aws-terraform-dev-container)
 * [ ] [Data Science with Python and R](https://github.com/microsoft/datascience-py-r)
