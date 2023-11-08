@@ -7,9 +7,12 @@ devcontainer-info
 
 echo "[x] Verify Git client":        $(git --version)
 echo "[x] Verify jq":                $(jq   --version)
+echo "[x] Verify make":              $(make -v)
+
 echo "[x] Verify AWS CLI version 2": $(aws --version)
 echo "[x] Verify NVM":               $(nvm --version)
 echo "[x] Verify Node.js":           $(node --version)
+echo "[x] Verify yarn":              $(yarn --version)
 
 echo "[x] Verify Python":            $(python -V)
 echo "[x] Verify Python3":           $(python3 -V)
@@ -31,3 +34,9 @@ echo "[x] Verify jupyter lab list":  $(jupyter lab list)
 echo "[-] Verify CDK":               $(cdk --version)
 echo "[-] Verify eksctl":            $(eksctl version)
 echo "[-] Verify k9s":               $(k9s version --short)
+
+echo "[x] Verify ngrok":             $(ngrok --versionn)
+
+tree -a | grep Dockerfile -C 1
+
+pip install ipykernel ipywidgets && if [ -f requirements.txt* ]; then pip install -r requirements.txt; else pip install pandas numpy scipy statsmodels matplotlib seaborn plotly scikit-learn; fi
