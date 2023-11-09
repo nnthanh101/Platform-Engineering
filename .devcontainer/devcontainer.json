@@ -59,17 +59,29 @@
 				"ms-python.vscode-pylance",
 				"ms-toolsai.jupyter",
 				"HashiCorp.terraform",
-				"AmazonWebServices.aws-toolkit-vscode"
+				"AmazonWebServices.aws-toolkit-vscode",
+				// "ms-python.black-formatter",
+				// "foxundermoon.shell-format"
 			],
 			"settings": {
-                "python.testing.pytestArgs": [
-                    "."
-                ],
-                "python.testing.unittestEnabled": false,
-                "python.testing.pytestEnabled": true,
-                "python.formatting.provider": "black",
-                "python.linting.mypyEnabled": true,
-                "python.linting.enabled": true
+				"[python]": {
+					// "editor.defaultFormatter": "ms-python.black-formatter",
+					"editor.formatOnSave": true,
+					"source.fixAll.ruff": false,
+					"source.organizeImports.ruff": true
+				},
+				"[shellscript]": {
+					// "editor.defaultFormatter": "foxundermoon.shell-format",
+					"editor.formatOnSave": true
+				}
+                // "python.testing.pytestArgs": [
+                //     "."
+                // ],
+                // "python.testing.unittestEnabled": false,
+                // "python.testing.pytestEnabled": true,
+                // "python.formatting.provider": "black",
+                // "python.linting.mypyEnabled": true,
+                // "python.linting.enabled": true
             }
 		}
 	},

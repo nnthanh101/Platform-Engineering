@@ -11,11 +11,19 @@ ENV LANG=C.UTF-8
 ENV TZ=Pacific/Auckland
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+# SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+## Minimal Ubuntu https://wiki.ubuntu.com/Minimal
+RUN apt-get update && yes | unminimize
 
 ## Install OS packages
-RUN apt-get update -qq && \
-    apt-get install -y --no-install-recommends make yarn imagemagick postgresql-client
+RUN apt-get update -qq &&   \
+    apt-get install -y --no-install-recommends \
+      make yarn imagemagick \
+      postgresql-client     \
+      libsqlite3-dev        \
+    && rm -rf /var/lib/apt/lists/*             \
+    && apt-get clean
 
 RUN update-ca-certificates
 
@@ -69,3 +77,6 @@ RUN echo "root ..."
 COPY post-install.sh /usr/local/bin/post-install
 RUN chmod +x /usr/local/bin/post-install
 RUN echo "./post-install ..."
+
+# ENV HOME /root
+# WORKDIR /root/
