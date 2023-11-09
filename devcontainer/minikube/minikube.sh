@@ -40,11 +40,11 @@ echo "===== Deploy a service to multi-node clusters on minikube ====="
 # minikube start --driver=docker --nodes 2 -p minikube
 
 echo "Deploying the K8s deployment ..."
-kubectl apply -f hello-deployment.yaml
-kubectl rollout status deployment/hello
+kubectl apply -f k8s-deployment.yaml
+# kubectl rollout status deployment/k8s
 
 echo "Deploying the K8s service ..."
-kubectl apply -f hello-svc.yaml
+kubectl apply -f k8s-svc.yaml
 
 echo "[x] Check out the IP addresses of our pods, to note for future reference"
 kubectl get pods -o wide
@@ -54,4 +54,3 @@ minikube service list
 
 echo "[x] Hitting the URL a few times and see what comes back"
 curl  http://192.168.49.2:31000
-

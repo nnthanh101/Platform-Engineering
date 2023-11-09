@@ -60,13 +60,24 @@
 				"ms-toolsai.jupyter",
 				"HashiCorp.terraform",
 				"AmazonWebServices.aws-toolkit-vscode"
-			]
+			],
+			"settings": {
+                "python.testing.pytestArgs": [
+                    "."
+                ],
+                "python.testing.unittestEnabled": false,
+                "python.testing.pytestEnabled": true,
+                "python.formatting.provider": "black",
+                "python.linting.mypyEnabled": true,
+                "python.linting.enabled": true
+            }
 		}
 	},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	"forwardPorts": [
 		3000,
+		4040,
 		5000,
 		8080,
 		8888,
@@ -78,6 +89,10 @@
             "label": "web:3000",
             "onAutoForward": "openPreview",
             "requireLocalPort": true
+        },
+		"4040": {
+            "label": "SparkUI",
+            "onAutoForward": "notify"
         },
 		"5000": {
             "label": "web:5000",

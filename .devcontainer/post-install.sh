@@ -35,8 +35,9 @@ echo "[-] Verify CDK":               $(cdk --version)
 echo "[-] Verify eksctl":            $(eksctl version)
 echo "[-] Verify k9s":               $(k9s version --short)
 
-echo "[x] Verify ngrok":             $(ngrok --versionn)
+echo "[x] Verify ngrok":             $(ngrok --version)
 
 tree -a | grep Dockerfile -C 1
 
+# pip install --upgrade pip
 pip install ipykernel ipywidgets && if [ -f requirements.txt* ]; then pip install -r requirements.txt; else pip install pandas numpy scipy statsmodels matplotlib seaborn plotly scikit-learn; fi
