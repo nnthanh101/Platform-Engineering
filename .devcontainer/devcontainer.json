@@ -1,24 +1,27 @@
 // For format details: https://aka.ms/devcontainer.json
 // For config options: https://github.com/devcontainers/templates/tree/main/src/alpine
 {
-	"name": "DevContainer",
-	"dockerComposeFile": "docker-compose.yml",
-    "service": "devcontainer",
-    "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"name": "DataOnK8s",
+	// Use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"build": {
+        "dockerfile": "Dockerfile"
+    },
+	// "dockerComposeFile": "docker-compose.yml",
 	// "image": "mcr.microsoft.com/devcontainers/base:alpine-3.18",
 	// "image": "mcr.microsoft.com/devcontainers/base:bookworm",
 	// "image": "mcr.microsoft.com/devcontainers/base:jammy",
-	// "build": {
-    //     "dockerfile": "Dockerfile"
-    // },
+    // "service": "devcontainer",
+    "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"remoteEnv": {
+        "GIT_EDITOR": "code --wait"
+    },
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
-		// "ghcr.io/devcontainers/features/docker-in-docker:2": {
-		// 	"enableNonRootDocker": "true",
-		// 	"moby": "true"
-		// },
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+			"enableNonRootDocker": "true",
+			"moby": "true"
+		},
 		"ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
 			"version": "latest",
 			"helm": "latest",
@@ -44,29 +47,98 @@
 		},
 		"ghcr.io/devcontainers/features/aws-cli:1": {
 			"version": "latest"
-		},
-		"ghcr.io/devcontainers-contrib/features/aws-cdk:2": {
-			"version": "latest"
 		}
+		// "ghcr.io/devcontainers-contrib/features/aws-cdk:2": {}
 	},
 	"customizations": {
 		"vscode": {
 			"extensions": [
-				"ms-vscode-remote.remote-containers"
-			]
+				"ms-vscode-remote.remote-containers",
+				"ms-azuretools.vscode-docker",
+				"ms-python.python",
+				"ms-python.vscode-pylance",
+				"ms-toolsai.jupyter",
+				"HashiCorp.terraform",
+				"AmazonWebServices.aws-toolkit-vscode",
+				// "ms-python.black-formatter",
+				// "foxundermoon.shell-format"
+			],
+			"settings": {
+				"[python]": {
+					// "editor.defaultFormatter": "ms-python.black-formatter",
+					"editor.formatOnSave": true,
+					"source.fixAll.ruff": false,
+					"source.organizeImports.ruff": true
+				},
+				"[shellscript]": {
+					// "editor.defaultFormatter": "foxundermoon.shell-format",
+					"editor.formatOnSave": true
+				}
+                // "python.testing.pytestArgs": [
+                //     "."
+                // ],
+                // "python.testing.unittestEnabled": false,
+                // "python.testing.pytestEnabled": true,
+                // "python.formatting.provider": "black",
+                // "python.linting.mypyEnabled": true,
+                // "python.linting.enabled": true
+            }
 		}
 	},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [5000],
+	"forwardPorts": [
+		3000,
+		4040,
+		5000,
+		8080,
+		8888,
+		5432,
+		27017
+	],
+	"portsAttributes": {
+        "3000": {
+            "label": "web:3000",
+            "onAutoForward": "openPreview",
+            "requireLocalPort": true
+        },
+		"4040": {
+            "label": "SparkUI",
+            "onAutoForward": "notify"
+        },
+		"5000": {
+            "label": "web:5000",
+            "onAutoForward": "notify",
+            "requireLocalPort": true
+        },
+		"8080": {
+            "label": "web:8080",
+            "onAutoForward": "notify",
+            "requireLocalPort": true
+        },
+		"8888": {
+			"label": "Jupyter",
+			"onAutoForward": "ignore",
+			"requireLocalPort": true
+		},
+        "5432": {
+            "label": "postgres"
+        },
+        "27017": {
+            "label": "mongodb"
+        }
+    },
 
 	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "sh .devcontainer/post-install.sh",
 	// "postCreateCommand": "pip3 install --user -r requirement.txt",
-	"postCreateCommand": "uname -a",
+	// "postCreateCommand": "uname -a",
 
 	// Configure tool-specific properties.
 	// "customizations": {},
 
+	"remoteUser": "vscode"
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
+	
 }
