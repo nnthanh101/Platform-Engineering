@@ -25,23 +25,23 @@ kubectl get pods -n kube-system
 echo "Getting all namespaces ..."
 kubectl get namespace
 
-echo "Viewing minikube kebernetes dashboard"
-minikube dashboard
+echo "Viewing minikube kebernetes dashboard !!!"
+# minikube dashboard
 
 ### WIP ###
 # minikube addons enable ingress
 # # Run this to forward to localhost in the background
 # nohup kubectl port-forward --pod-running-timeout=24h -n ingress-nginx service/ingress-nginx-controller :80 &
 
-echo "Deleting minikube cluster (use –all to delete all clusters)"
-minikube delete
+echo "Deleting minikube cluster (use –all to delete all clusters) !!!"
+# minikube delete
 
 echo "===== Deploy a service to multi-node clusters on minikube ====="
 # minikube start --driver=docker --nodes 2 -p minikube
 
 echo "Deploying the K8s deployment ..."
 kubectl apply -f k8s-deployment.yaml
-# kubectl rollout status deployment/k8s
+# kubectl rollout status deployment/hello
 
 echo "Deploying the K8s service ..."
 kubectl apply -f k8s-svc.yaml
@@ -53,4 +53,4 @@ echo "[x] Looking at our service, to know what URL to hit"
 minikube service list
 
 echo "[x] Hitting the URL a few times and see what comes back"
-curl  http://192.168.49.2:31000
+curl http://192.168.49.2:31000
