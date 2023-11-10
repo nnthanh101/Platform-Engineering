@@ -41,3 +41,7 @@ tree -a | grep Dockerfile -C 1
 
 # pip install --upgrade pip
 pip install ipykernel ipywidgets && if [ -f requirements.txt* ]; then pip install -r requirements.txt; else pip install pandas numpy scipy statsmodels matplotlib seaborn plotly scikit-learn; fi
+
+echo "Minikube ..."
+cd devcontainer/minikube
+./minikube.sh

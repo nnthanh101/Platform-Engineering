@@ -1,6 +1,10 @@
 nohup bash -c 'minikube start &' > minikube.log 2>&1
 
-minikube start --driver=docker --nodes 2
+echo "Deleting minikube cluster (use –all to delete all clusters) !!!"
+minikube delete --profile=minikube
+
+minikube start --profile=minikube --driver=docker --nodes 2
+sleep 30
 
 minikube kubectl get nodes
 minikube status
@@ -33,15 +37,13 @@ echo "Viewing minikube kebernetes dashboard !!!"
 # # Run this to forward to localhost in the background
 # nohup kubectl port-forward --pod-running-timeout=24h -n ingress-nginx service/ingress-nginx-controller :80 &
 
-echo "Deleting minikube cluster (use –all to delete all clusters) !!!"
-# minikube delete
-
 echo "===== Deploy a service to multi-node clusters on minikube ====="
 # minikube start --driver=docker --nodes 2 -p minikube
 
 echo "Deploying the K8s deployment ..."
 kubectl apply -f k8s-deployment.yaml
-# kubectl rollout status deployment/hello
+kubectl rollout status deployment/hello
+sleep 15
 
 echo "Deploying the K8s service ..."
 kubectl apply -f k8s-svc.yaml

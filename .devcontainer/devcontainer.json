@@ -2,15 +2,16 @@
 // For config options: https://github.com/devcontainers/templates/tree/main/src/alpine
 {
 	"name": "DataOnK8s",
+	"dockerComposeFile": "docker-compose.yml",
 	// Use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-	"build": {
-        "dockerfile": "Dockerfile"
-    },
-	// "dockerComposeFile": "docker-compose.yml",
+	// "build": {
+    //     "dockerfile": "Dockerfile"
+    // },
 	// "image": "mcr.microsoft.com/devcontainers/base:alpine-3.18",
 	// "image": "mcr.microsoft.com/devcontainers/base:bookworm",
 	// "image": "mcr.microsoft.com/devcontainers/base:jammy",
-    // "service": "devcontainer",
+
+	"service": "k8s",
     "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 	"remoteEnv": {
         "GIT_EDITOR": "code --wait"
@@ -140,5 +141,4 @@
 	"remoteUser": "vscode"
 	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
 	// "remoteUser": "root"
-	
 }

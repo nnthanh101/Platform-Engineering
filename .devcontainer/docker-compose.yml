@@ -1,15 +1,20 @@
 version: '3.8'
+
 services:
-  devcontainer:
+
+  ## devcontainer:
+  k8s:
     build: 
       context: .
       dockerfile: Dockerfile
     volumes:
+      # - ..:/workspaces:cached
       - ../..:/workspaces:cached
       - $HOME/.ssh/:/home/vscode/.ssh/
-    
+
     ## Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
+    # command: /bin/sh -c "while sleep 1000; do :; done" 
 
     ## Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
     network_mode: service:db
