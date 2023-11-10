@@ -45,3 +45,6 @@ pip install ipykernel ipywidgets && if [ -f requirements.txt* ]; then pip instal
 echo "Minikube ..."
 cd devcontainer/minikube
 ./minikube.sh
+
+echo "Running adminer Database management ..."
+# docker run -p 8080:8080 -e ADMINER_DEFAULT_SERVER=postgre adminer
