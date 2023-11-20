@@ -5,7 +5,7 @@
 ## Build, Scale, and Optimize Data & AI/ML Platforms on K8s
 
 ### 🏗️ Architecture
-The diagram below showcases the wide array of open-source data tools, Kubernetes operators, and frameworks supported by DoK8s. It also highlights the seamless integration of Data Analytics managed services with the powerful capabilities of DoK8s open-source tools.
+The diagram below showcases the wide array of open-source data tools, Kubernetes operators, and frameworks supported by DoK8s. It also highlights the seamless integration of Data Analytics managed services with the powerful capabilities of DoK8s open-source tools: reusable, composable, configurable.
 
 <img width="800" alt="image" src="README/images/DoK8s-Architecture.png">
 
