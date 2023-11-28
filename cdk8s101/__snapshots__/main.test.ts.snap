@@ -1,0 +1,301 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Placeholder Empty 1`] = `
+Array [
+  Object {
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": Object {
+      "labels": Object {
+        "app": "voting-app",
+      },
+      "name": "test-chart-redisdeployment-c8b54ef8",
+    },
+    "spec": Object {
+      "replicas": 2,
+      "selector": Object {
+        "matchLabels": Object {
+          "cdk8s.deployment": "test-chart-RedisDeployment-c8386966",
+        },
+      },
+      "template": Object {
+        "metadata": Object {
+          "labels": Object {
+            "cdk8s.deployment": "test-chart-RedisDeployment-c8386966",
+          },
+        },
+        "spec": Object {
+          "containers": Array [
+            Object {
+              "env": Array [],
+              "image": "redis",
+              "imagePullPolicy": "Always",
+              "name": "main",
+              "ports": Array [
+                Object {
+                  "containerPort": 6379,
+                },
+              ],
+              "volumeMounts": Array [],
+            },
+          ],
+          "volumes": Array [],
+        },
+      },
+    },
+  },
+  Object {
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": Object {
+      "name": "test-chart-redisdeployment-service-c8532189",
+    },
+    "spec": Object {
+      "externalIPs": Array [],
+      "ports": Array [
+        Object {
+          "port": 6379,
+          "targetPort": 6379,
+        },
+      ],
+      "selector": Object {
+        "cdk8s.deployment": "test-chart-RedisDeployment-c8386966",
+      },
+      "type": "LoadBalancer",
+    },
+  },
+  Object {
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": Object {
+      "labels": Object {
+        "app": "voting-app",
+      },
+      "name": "test-chart-postgresdeployment-c8d4d47f",
+    },
+    "spec": Object {
+      "replicas": 1,
+      "selector": Object {
+        "matchLabels": Object {
+          "cdk8s.deployment": "test-chart-PostgresDeployment-c8a28af3",
+        },
+      },
+      "template": Object {
+        "metadata": Object {
+          "labels": Object {
+            "cdk8s.deployment": "test-chart-PostgresDeployment-c8a28af3",
+          },
+        },
+        "spec": Object {
+          "containers": Array [
+            Object {
+              "env": Array [
+                Object {
+                  "name": "POSTGRES_USER",
+                  "value": "postgres",
+                },
+                Object {
+                  "name": "POSTGRES_PASSWORD",
+                  "value": "postgres",
+                },
+              ],
+              "image": "postgres:9.4",
+              "imagePullPolicy": "Always",
+              "name": "main",
+              "ports": Array [
+                Object {
+                  "containerPort": 5432,
+                },
+              ],
+              "volumeMounts": Array [],
+            },
+          ],
+          "volumes": Array [],
+        },
+      },
+    },
+  },
+  Object {
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": Object {
+      "name": "test-chart-postgresdeployment-service-c80227a9",
+    },
+    "spec": Object {
+      "externalIPs": Array [],
+      "ports": Array [
+        Object {
+          "port": 5432,
+          "targetPort": 5432,
+        },
+      ],
+      "selector": Object {
+        "cdk8s.deployment": "test-chart-PostgresDeployment-c8a28af3",
+      },
+      "type": "LoadBalancer",
+    },
+  },
+  Object {
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": Object {
+      "labels": Object {
+        "app": "voting-app",
+      },
+      "name": "test-chart-votingappdeployment-c83dc4f3",
+    },
+    "spec": Object {
+      "replicas": 1,
+      "selector": Object {
+        "matchLabels": Object {
+          "cdk8s.deployment": "test-chart-VotingAppDeployment-c8e5f363",
+        },
+      },
+      "template": Object {
+        "metadata": Object {
+          "labels": Object {
+            "cdk8s.deployment": "test-chart-VotingAppDeployment-c8e5f363",
+          },
+        },
+        "spec": Object {
+          "containers": Array [
+            Object {
+              "env": Array [],
+              "image": "bretfisher/examplevotingapp_vote:latest",
+              "imagePullPolicy": "Always",
+              "name": "main",
+              "ports": Array [
+                Object {
+                  "containerPort": 80,
+                },
+              ],
+              "volumeMounts": Array [],
+            },
+          ],
+          "volumes": Array [],
+        },
+      },
+    },
+  },
+  Object {
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": Object {
+      "name": "test-chart-votingappdeployment-service-c863ea1d",
+    },
+    "spec": Object {
+      "externalIPs": Array [],
+      "ports": Array [
+        Object {
+          "port": 80,
+          "targetPort": 80,
+        },
+      ],
+      "selector": Object {
+        "cdk8s.deployment": "test-chart-VotingAppDeployment-c8e5f363",
+      },
+      "type": "LoadBalancer",
+    },
+  },
+  Object {
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": Object {
+      "labels": Object {
+        "app": "voting-app",
+      },
+      "name": "test-chart-resultappdeployment-c8ceab96",
+    },
+    "spec": Object {
+      "replicas": 1,
+      "selector": Object {
+        "matchLabels": Object {
+          "cdk8s.deployment": "test-chart-ResultAppDeployment-c814b79d",
+        },
+      },
+      "template": Object {
+        "metadata": Object {
+          "labels": Object {
+            "cdk8s.deployment": "test-chart-ResultAppDeployment-c814b79d",
+          },
+        },
+        "spec": Object {
+          "containers": Array [
+            Object {
+              "env": Array [],
+              "image": "bretfisher/examplevotingapp_result:latest",
+              "imagePullPolicy": "Always",
+              "name": "main",
+              "ports": Array [
+                Object {
+                  "containerPort": 80,
+                },
+              ],
+              "volumeMounts": Array [],
+            },
+          ],
+          "volumes": Array [],
+        },
+      },
+    },
+  },
+  Object {
+    "apiVersion": "v1",
+    "kind": "Service",
+    "metadata": Object {
+      "name": "test-chart-resultappdeployment-service-c8d371f7",
+    },
+    "spec": Object {
+      "externalIPs": Array [],
+      "ports": Array [
+        Object {
+          "port": 80,
+          "targetPort": 80,
+        },
+      ],
+      "selector": Object {
+        "cdk8s.deployment": "test-chart-ResultAppDeployment-c814b79d",
+      },
+      "type": "LoadBalancer",
+    },
+  },
+  Object {
+    "apiVersion": "apps/v1",
+    "kind": "Deployment",
+    "metadata": Object {
+      "labels": Object {
+        "app": "voting-app",
+      },
+      "name": "test-chart-workerappdeploy-c832416a",
+    },
+    "spec": Object {
+      "replicas": 1,
+      "selector": Object {
+        "matchLabels": Object {
+          "cdk8s.deployment": "test-chart-WorkerAppDeploy-c8dcb1e3",
+        },
+      },
+      "template": Object {
+        "metadata": Object {
+          "labels": Object {
+            "cdk8s.deployment": "test-chart-WorkerAppDeploy-c8dcb1e3",
+          },
+        },
+        "spec": Object {
+          "containers": Array [
+            Object {
+              "env": Array [],
+              "image": "bretfisher/examplevotingapp_worker:latest",
+              "imagePullPolicy": "Always",
+              "name": "main",
+              "ports": Array [],
+              "volumeMounts": Array [],
+            },
+          ],
+          "volumes": Array [],
+        },
+      },
+    },
+  },
+]
+`;

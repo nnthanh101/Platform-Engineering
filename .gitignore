@@ -45,3 +45,5 @@ operations/variable-scripts/variable.json
 # IDES
 .idea/
 .vscode/
+
+error.log
