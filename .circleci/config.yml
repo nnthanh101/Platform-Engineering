@@ -1,0 +1,100 @@
+version: 2.1
+
+## Prerequisite: make sure you set secret enviroment variables in CICD
+## DOCKER_USERNAME
+## DOCKER_PASSWORD
+## API_TOKEN
+
+## REBUILD - it has default value "false", if need rebuild the image, turn it on with value "true"
+
+parameters:
+  rebuild:
+    type: string
+    default: "false"
+
+jobs:
+  build:
+    docker:
+      - image: alpine/docker-with-buildx
+    environment:
+      REBUILD: << pipeline.parameters.rebuild >>
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 20.10.24
+      - run:
+          name: Run Build
+          no_output_timeout: 30m
+          command: |
+            apk --no-cache --update add bash curl sudo
+            echo $REBUILD
+            bash ./devcontainer/aws-terraform/build.sh
+
+  scan:
+    docker:
+      - image: alpine/trivy
+    steps:
+      - checkout
+      - run: |
+          apk add bash
+          latest_versions=$(bash ./devcontainer/aws-terraform/latest_versions.sh)
+          for tag in ${latest_versions}
+          do
+            echo "Scan image alpine/k8s:${tag} ..."
+            trivy image -s "HIGH,CRITICAL" alpine/k8s:${tag}
+            echo "==== End of Scan ===="
+          done
+
+workflows:
+  build:
+    jobs:
+      - build:
+          name: build
+          context: Docker-Hub
+          filters:
+            branches:
+              only:
+                - DevContainers
+                - main
+      - scan:
+          requires:
+            - build
+          name: scan
+          context:
+            - Docker-Hub
+          filters:
+            branches:
+              only:
+                - DevContainers
+                - main
+
+  nightly:
+    triggers:
+       - schedule:
+           cron: "0 0 1 * *"
+           filters:
+             branches:
+               only:
+                 - DevContainers
+                 - main
+    jobs:
+      - build:
+          name: build
+          context: Docker-Hub
+          filters:
+            branches:
+              only:
+                - DevContainers
+                - main
+
+      - scan:
+          requires:
+            - build
+          name: scan
+          context:
+            - Docker-Hub
+          filters:
+            branches:
+              only:
+                - DevContainers
+                - main
