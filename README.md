@@ -1,6 +1,6 @@
 # The GitOps Platform for Data Analytics on Kubernetes 🚀
 
-🎯 **DoK8s** is a tool to build, deploy and scale Data Platforms on Amazon EKS 🌥️ using HashiCorp's Terraform Infrastructure as Code (IaC) to provide speed, scale, agility, and low cost. ⚡
+🎯 The GitOps Platform for Data Analytics utilizes Kubernetes (K8s) and HashiCorp's Terraform Infrastructure as Code (IaC) on the AWS Cloud 🌥️, offering speed, scalability, agility, and cost efficiency. ⚡
 
 ## Build, Scale, and Optimize Data & AI/ML Platforms on K8s
 
