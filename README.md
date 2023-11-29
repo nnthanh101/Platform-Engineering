@@ -1,4 +1,4 @@
-# Data on Kubernetes (DoK8s) using Terraform 🚀
+# 🌥️ The GitOps Platform for Data Analytics on Kubernetes 🚀
 
 🎯 **DoK8s** is a tool to build, deploy and scale Data Platforms on Amazon EKS 🌥️ using HashiCorp's Terraform Infrastructure as Code (IaC) to provide speed, scale, agility, and low cost. ⚡
 
