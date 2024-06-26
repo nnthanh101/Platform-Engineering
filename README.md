@@ -21,6 +21,7 @@ Data on K8s (DoK8s) solution is categorized into the following focus areas.
 ## 🏃‍♀️ Deliverables
 
 * [x] 🚀 Reproducible Local Development with Dev Containers: VSCode, K8s, TF, Python/R
+  * [x] [data-engineering-python](.devcontainer/data-engineering-python): Docker + VScode + Python = ❤️
 * [ ] 🚀 [JupyterHub on EKS](docs/blueprints/ai-ml/jupyterhub) 👈 This blueprint deploys a self-managed JupyterHub on EKS with Amazon Cognito authentication.
 * [ ] 🚀 [Spark Operator with Apache YuniKorn on EKS](docs/blueprints/data-analytics/spark-operator-yunikorn) 👈 This blueprint deploys EKS cluster and uses Spark Operator and Apache YuniKorn for running self-managed Spark jobs
 * [ ] 🚀 [Self-managed Airflow on EKS](docs/blueprints/job-schedulers/self-managed-airflow) 👈 This blueprint sets up a self-managed Apache Airflow on an Amazon EKS cluster, following best practices.
