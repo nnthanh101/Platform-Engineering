@@ -1,0 +1,218 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/javascript-node-postgres
+{
+	"name": "Developer Experience (DevEx) Platform: Node.js & PostgreSQL",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "devex",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {
+    // "ghcr.io/microsoft/k3s-on-host":{
+    //     "k3sVersion": "latest",
+    //     "criDockerd": "true",
+    //     "cluster_enabled": "true"
+    // },
+    //         
+    // "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+    //   "version": "latest",
+    //   "moby": "true",
+    // },
+    // "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+		// 	"version": "latest",
+		// 	"helm": "latest",
+		// 	"minikube": "latest"
+		// },
+		"ghcr.io/devcontainers/features/python:1.6.2": {
+      "installTools": true,
+      "installOhMyZsh": true,
+      "optimize": true,
+      "installJupyterlab": true,
+			// "configureJupyterlabAllowOrigin": "",
+      "version": "3.12"
+    },
+    // "ghcr.io/devcontainers-contrib/features/mkdocs:2.0.18": {},
+		"ghcr.io/devcontainers/features/terraform:1": {
+			"installSentinel": true,
+			"installTFsec": true,
+			"installTerraformDocs": true,
+			"version": "latest",
+			"tflint": "latest",
+			"terragrunt": "latest"
+		},
+		"ghcr.io/dhoeric/features/terraform-docs:1": {},
+		"ghcr.io/devcontainers/features/aws-cli:1": {
+			"version": "latest"
+		},
+		// "ghcr.io/devcontainers-contrib/features/aws-cdk:2": {
+		// 	"version": "latest"
+		// },
+		"ghcr.io/devcontainers/features/common-utils:2.4.3": {
+      "installZsh": true,
+      "installOhMyZsh": "true",
+      "username": "devex",
+      "userUid": "1001",
+      "userGid": "1001",
+      "upgradePackages": true
+    },
+		"ghcr.io/devcontainers/features/git-lfs:1": {
+			"version": "latest",
+			"autoPull": true,
+			"installDirectlyFromGitHubRelease": false
+		},
+		// "ghcr.io/devcontainers-contrib/features/atlantis:1.0.5": {},
+    // "ghcr.io/devcontainers-contrib/features/argo-cd:1": {},
+    // "ghcr.io/devcontainers-contrib/features/argo-workflows:1": {},
+    // "ghcr.io/devcontainers-contrib/features/vault-asdf:2.0.14": {},
+	},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// This can be used to network with other containers or with the host.
+	"forwardPorts": [
+    // 3000,
+    // 4040,
+    // 5000,
+    5432,
+    // 7007,
+    // 8000,
+    8080,
+    8888,
+    // 9000,
+    // 27017
+  ],
+  "portsAttributes": {
+    // "3000": {
+    //   "label": "Backstage Frontend",
+    //   "onAutoForward": "openPreview",
+    //   "requireLocalPort": true
+    // },
+		// "4040": {
+    //         "label": "SparkUI",
+    //         "onAutoForward": "notify"
+    // },
+    // "7007": {
+    //   "label": "Backstage Backend",
+    //   "onAutoForward": "openPreview",
+    //   "requireLocalPort": true
+    // },
+    // "4040": {
+    //   "label": "SparkUI",
+    //   "onAutoForward": "notify"
+    // },
+    // "5000": {
+    //   "label": "Docusaurus",
+    //   "onAutoForward": "notify",
+    //   "requireLocalPort": true
+    // },
+    "5432": {
+      "label": "PostgreSQL",
+      "onAutoForward": "silent",
+      // "requireLocalPort": true
+    },
+    "8080": {
+      "label": "Adminer",
+      "onAutoForward": "notify",
+      "requireLocalPort": true
+    },
+    "8888": {
+      "label": "Jupyter",
+      "onAutoForward": "ignore",
+      "requireLocalPort": true
+    },
+    // "8085": {
+    //   "label": "Trino",
+    //   "onAutoForward": "ignore",
+    //   "requireLocalPort": true
+    // },
+    // "9000": {
+    //   "label": "Traefik",
+    //   "onAutoForward": "notify",
+    //   "requireLocalPort": true
+    // },
+    // "9000": {
+    //   "label": "Minio",
+    //   "onAutoForward": "ignore",
+    //   "requireLocalPort": true
+    // },
+    // "27017": {
+    //     "label": "mongodb"
+    // }
+  },
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": "bash .devcontainer/postCreate.sh",
+
+	// Configure tool-specific properties.
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // Documentation Extensions
+        "redhat.vscode-yaml",
+        "yzhang.markdown-all-in-one",
+        // Docker Supporting Extensions
+        "ms-azuretools.vscode-docker",
+        "ms-vscode-remote.remote-containers",
+        // Python Extensions
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter",
+        "ms-toolsai.jupyter-renderers",
+        // "ms-toolsai.jupyter-keymap",
+        // Github Actions
+        "github.vscode-github-actions",
+        // Kubernetes, Terraform & Amazon AWS
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "HashiCorp.terraform",
+        "AmazonWebServices.aws-toolkit-vscode",
+        // SQL, CSV, ngrok
+        "mtxr.sqltools",
+				"mtxr.sqltools-driver-pg",
+				"mechatroner.rainbow-csv",
+        "philnash.ngrok-for-vscode",
+      ],
+      "settings": {
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.black-formatter",
+          "editor.formatOnSave": true,
+          "editor.formatOnType": true,
+        },
+        "files.autoSave": "afterDelay",
+        "files.autoSaveDelay": 1000,
+        "[jupyter]": {
+          "themeMatplotlibPlots": true,
+          "widgetScriptSources": [
+            "unpkg.com",
+            "jsdelivr.com"
+          ]
+        },
+        // "[r]": {
+        //   "rterm.linux": "/usr/local/bin/radian",
+        //   "r.bracketedPaste": true
+        // },
+        "[shellscript]": {
+          "editor.formatOnSave": true
+        },
+        "sqltools.connections": [
+          {
+            "name": "Container Database",
+            "driver": "PostgreSQL",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "database": "idpdb",
+            "username": "idpuser",
+            "password": "idppassword"
+          }
+        ],
+        "files.exclude": {
+					".ruff_cache": true,
+					".pytest_cache": true
+				}
+      }
+    }
+  },
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+  "remoteUser": "devex"
+}

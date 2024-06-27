@@ -7,7 +7,7 @@
 ### 🏗️ Architecture
 The diagram below showcases the wide array of open-source data tools, Kubernetes operators, and frameworks supported by DoK8s. It also highlights the seamless integration of Data Analytics managed services with the powerful capabilities of DoK8s open-source tools: reusable, composable, configurable.
 
-<img width="800" alt="image" src="README/images/DoK8s-Architecture.png">
+<img width="800" alt="image" src="architecture/DevEx-Architecture.png">
 
 ### 🌟 Features
 Data on K8s (DoK8s) solution is categorized into the following focus areas.

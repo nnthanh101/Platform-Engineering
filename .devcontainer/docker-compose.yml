@@ -1,0 +1,169 @@
+version: '3.9'
+
+services:
+  devex:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+
+    volumes:
+      - ../..:/workspaces:cached
+      - $HOME/.ssh/:/home/vscode/.ssh/
+      ## 1 bind mount: First copies your backstage app to the /workspace directory of your DevContainer
+      ## 3 anonymous volumes: then maps out the contents of 3 node_modules to persistent volumes
+      # - .:/workspace
+      # - /workspace/node_modules
+      # - /workspace/packages/app/node_modules
+      # - /workspace/packages/backend/node_modules
+      # - ${LOCAL_WORKSPACE_FOLDER:-./}:/workspace
+      
+    ## Overrides default command so things don't shut down after the process ends.
+    command: sleep infinity
+    # command: /bin/sh -c "while sleep 1000; do :; done"
+
+    ## Runs app on the same network as the database container, allows "forwardPorts" in devcontainer.json function.
+    network_mode: service:db
+
+    ## Use "forwardPorts" in **devcontainer.json** to forward an app port locally. 
+    ## (Adding the "ports" property to this file will not forward from a Codespace.)
+
+  # redis:
+  #   image: redis:${REDIS_VERSION:-7.2.5}
+  #   restart: unless-stopped
+  #   volumes:
+  #     - redis-data:/var/lib/redis/data
+  #   ports:
+  #     - 6379:6379
+
+  ## image: adminer or dpage/pgadmin4:latest
+  # adminer:
+  #   image: adminer
+  #   container_name: adminer
+  #   restart: always
+  #   ports:
+  #     - 8080:8080
+  #   # network_mode: service:db
+  #   environment:
+  #     ADMINER_DEFAULT_SERVER: db
+  #     ADMINER_DESIGN: dracula
+
+  db:
+    image: postgres:latest
+    # image: postgres:16-alpine
+    # command: ["-c", "fsync=off", "-c", "full_page_writes=off", "-c", "synchronous_commit=off"]
+    restart: unless-stopped
+    # restart: always
+    # network_mode: host
+    expose:
+    - 5432
+    ports:
+      - 5432:5432
+    # env_file:
+    #   - ./.env
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      ## The POSTGRES_HOST_AUTH_METHOD=trust env var allows passwordless access for localhost
+      # POSTGRES_HOST_AUTH_METHOD: trust
+    healthcheck:
+      test: pg_isready -U postgres -h 127.0.0.1
+      interval: 5s
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      # - type: volume
+      #   target: /usr/share/postgresql/data
+      # - /etc/localtime:/etc/localtime:ro
+
+    # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
+    # (Adding the "ports" property to this file will not forward from a Codespace.)
+
+  # trino:
+  #   hostname: trino
+  #   image: 'trinodb/trino:433'
+  #   ports:
+  #     - '8085:8080'
+  #   volumes:
+  #     - ./etc:/usr/lib/trino/etc:ro
+  #   networks:
+  #     - trino-network
+  #
+  # mariadb:
+  #   hostname: mariadb
+  #   image: mariadb:10.6.16
+  #   ports:
+  #     - 3306:3306
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: admin
+  #     MYSQL_USER: admin
+  #     MYSQL_PASSWORD: admin
+  #     MYSQL_DATABASE: metastore_db
+  #   # volumes:
+  #   #   - mariadb-data:/var/lib/mysql
+  #   networks:
+  #     - trino-network
+  #
+  # hive-metastore:
+  #   hostname: hive-metastore
+  #   image: 'bitsondatadev/hive-metastore:latest'
+  #   ports:
+  #     - '9083:9083' # Metastore Thrift
+  #   volumes:
+  #     - ./conf/metastore-site.xml:/opt/apache-hive-metastore-3.0.0-bin/conf/metastore-site.xml:ro
+  #   environment:
+  #     METASTORE_DB_HOSTNAME: mariadb
+  #   depends_on:
+  #     - mariadb
+  #   networks:
+  #     - trino-network
+
+  # minio:
+  #   hostname: minio
+  #   image: 'minio/minio'
+  #   container_name: minio
+  #   ports:
+  #     - 9000:9000
+  #     - 9001:9001
+  #   volumes:
+  #     - minio-data:/data
+  #   environment:
+  #     MINIO_ACCESS_KEY: minio_access_key
+  #     MINIO_SECRET_KEY: minio_secret_key
+  #   # command: server /data
+  #   command: server /data --console-address ":9001"
+  #   networks:
+  #     - trino-network
+
+  # nessie:
+  #   image: projectnessie/nessie
+  #   container_name: nessie
+  #   ports:
+  #     - "19120:19120"
+
+  elasticsearch:
+    build:
+      context: docker/elasticsearch
+      args:
+        ELK_VERSION: 8.14.1
+    volumes:
+      - type: volume
+        target: /usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    environment:
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+      ELASTIC_PASSWORD: changeme
+      discovery.type: single-node
+    restart:
+      on-failure:60
+
+volumes:
+  postgres-data:
+  # redis-data:
+  # minio-data:
+  #   driver: local
+
+# networks:
+#   trino-network:
+#     driver: bridge
