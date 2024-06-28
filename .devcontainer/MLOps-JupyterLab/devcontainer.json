@@ -2,13 +2,14 @@
 // For DevContainer Templates, see https://containers.dev/templates
 // For config options,         see https://github.com/devcontainers/templates/tree/main/src/ubuntu
 {
-  "name": "Data Engineering: Python",
-  // "image": "nnthanh101/data-engineering",
+  "name": "MLOps: JupyterLab, Python, R, Tensorflow, PyTorch",
+  // "image": "quay.io/jupyter/${baseVariant}:${imageVariant}",
   "build": { 
-    "dockerfile": "Dockerfile"
+    "dockerfile": "Dockerfile",
+    // "args": { "accept_license": "Y" }
   },
-  // "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached", 
-  // "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached", 
+  "workspaceFolder": "/workspace",
 
   // Features to add to the DevContainer, see https://containers.dev/features
   "features": {
@@ -17,28 +18,44 @@
       "version": "20",
       "nvmVersion": "latest"
     },
+    // "ghcr.io/devcontainers/features/python:1.6.2": {
+    //   "installTools": true,
+    //   "optimize": true,
+    //   "installJupyterlab": true,
+    //   "version": "3.12"
+    // },
     "ghcr.io/devcontainers/features/common-utils:2.4.3": {
 			"installZsh": "true",
-			"username": "dataops",
-			"userUid": "1000",
-			"userGid": "1000",
+      "installOhMyZsh": "true",
+			"username": "jovyan",
+			"userUid": "1001",
+			"userGid": "1001",
 			"upgradePackages": "true"
 		},
   },
-  
+
+  // The default command of the base image is set to start the Jupyter server. If you do not use the Jupyter server, comment out "overrideCommand": false
+	"overrideCommand": false,
+
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   "forwardPorts": [
     5000,
+    8888,
   ],
   "portsAttributes": {
     "5000": {
       "label": "Application",
       "onAutoForward": "notify"
     },
+    "8888": {
+      "label": "Jupyter",
+			"requireLocalPort": true,
+			"onAutoForward": "ignore"
+    },
   },
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "bash .devcontainer/data-engineering-python/postCreate.sh",
+  "postCreateCommand": "bash .devcontainer/data-science-jupyterlab/postCreate.sh",
 
   // Extensions for Visual Studio Code: https://marketplace.visualstudio.com/
   "customizations": {
@@ -66,23 +83,22 @@
             "jsdelivr.com"
           ]
         },
-        // "sqltools.connections": [
-        //   {
-        //     "name": "Container Database",
-        //     "driver": "PostgreSQL",
-        //     "previewLimit": 50,
-        //     "server": "localhost",
-        //     "port": 5432,
-        //     "database": "idpdb",
-        //     "username": "idpuser",
-        //     "password": "idppassword"
-        //   }
-        // ],
+        "sqltools.connections": [
+          {
+            "name": "Container Database",
+            "driver": "PostgreSQL",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "database": "idpdb",
+            "username": "idpuser",
+            "password": "idppassword"
+          }
+        ],
       }
     }
   },
-  
+
   // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root
-  // "remoteUser": "root",
-  "remoteUser": "dataops",
+  // "remoteUser": "root"
 }

@@ -25,7 +25,6 @@
 		// },
 		"ghcr.io/devcontainers/features/python:1.6.2": {
       "installTools": true,
-      "installOhMyZsh": true,
       "optimize": true,
       "installJupyterlab": true,
 			// "configureJupyterlabAllowOrigin": "",
@@ -49,7 +48,7 @@
 		// },
 		"ghcr.io/devcontainers/features/common-utils:2.4.3": {
       "installZsh": true,
-      "installOhMyZsh": "true",
+      "installOhMyZsh": true,
       "username": "devex",
       "userUid": "1001",
       "userGid": "1001",

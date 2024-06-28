@@ -1,0 +1,50 @@
+### Stage 1. Builder Image
+FROM python:3.12-slim AS builder
+
+# ENV PIP_DEFAULT_TIMEOUT=100 \
+#     ## Allow statements and log messages to immediately appear
+#     PYTHONUNBUFFERED=1 \
+#     ## disable a pip version check to reduce run-time & log-spam
+#     PIP_DISABLE_PIP_VERSION_CHECK=1 \
+#     ## cache is useless in docker image, so disable to reduce image size
+#     PIP_NO_CACHE_DIR=1
+
+ARG VENV_NAME="DataOps"
+ENV VENV_NAME=$VENV_NAME
+
+## Create directory for requirements and copy installation scripts
+RUN mkdir -p /requirements
+COPY install_requirements.sh /requirements/
+COPY requirements.txt /requirements/
+
+## Run installation script to setup the virtual environment
+RUN bash /requirements/install_requirements.sh $VENV_NAME
+
+
+### Final Stage: Copy the Python virtual environment from Builder Image
+FROM python:3.12-slim AS final
+
+ARG VENV_NAME="DataOps"
+ENV VENV_NAME=$VENV_NAME
+
+LABEL maintainer="nnthanh101@gmail.com"
+LABEL version="1.0.1"
+
+## Set locale and timezone
+ENV LANG=C.UTF-8
+ENV TZ=Pacific/Auckland
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+## Copy virtual environment from builder stage
+COPY --from=builder /opt/$VENV_NAME /opt/$VENV_NAME
+
+## Ensure the virtual environment is activated in the new shell OR for all users within the container
+# RUN echo "source /opt/$VENV_NAME/bin/activate" >> ~/.bashrc
+RUN echo "source /opt/$VENV_NAME/bin/activate" >> /etc/bash.bashrc
+
+## Copy and run dependencies installation script
+COPY install_dependencies.sh /requirements/install_dependencies.sh
+RUN bash /requirements/install_dependencies.sh
+
+## Optional: CMD to start JupyterLab if it's installed
+# CMD ["bash", "-c", "source /opt/$VENV_NAME/bin/activate && jupyter lab --ip=0.0.0.0 --allow-root"]

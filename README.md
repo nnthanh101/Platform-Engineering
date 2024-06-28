@@ -1,4 +1,4 @@
-# The GitOps Platform for Data Analytics on Kubernetes 🚀
+# The Developer Experience (DevEx) Platform for Data Analytics on Kubernetes 🚀
 
 🎯 The GitOps Platform for Data Analytics utilizes Kubernetes (K8s) and HashiCorp's Terraform Infrastructure as Code (IaC) on the AWS Cloud 🌥️, offering speed, scalability, agility, and cost efficiency. ⚡
 

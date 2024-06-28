@@ -2,14 +2,13 @@
 // For DevContainer Templates, see https://containers.dev/templates
 // For config options,         see https://github.com/devcontainers/templates/tree/main/src/ubuntu
 {
-  "name": "Data Science: JupyterLab, Python",
-  // "image": "quay.io/jupyter/${baseVariant}:${imageVariant}",
+  "name": "DataOps: Python, JupyterLab, NodeJS",
+  // "image": "nnthanh101/dataops:arm64",
   "build": { 
-    "dockerfile": "Dockerfile",
-    // "args": { "accept_license": "Y" }
+    "dockerfile": "Dockerfile"
   },
-  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached", 
-  "workspaceFolder": "/workspace",
+  // "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached", 
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 
   // Features to add to the DevContainer, see https://containers.dev/features
   "features": {
@@ -18,29 +17,20 @@
       "version": "20",
       "nvmVersion": "latest"
     },
-    // "ghcr.io/devcontainers/features/python:1.6.2": {
-    //   "installTools": true,
-    //   "optimize": true,
-    //   "installJupyterlab": true,
-    //   "version": "3.12"
-    // },
     "ghcr.io/devcontainers/features/common-utils:2.4.3": {
-			"installZsh": "true",
-      "installOhMyZsh": "true",
-			"username": "jovyan",
-			"userUid": "1001",
-			"userGid": "1001",
-			"upgradePackages": "true"
+			"installZsh": true,
+      "installOhMyZsh": true,
+			"username": "DataOps",
+			"userUid": "1000",
+			"userGid": "1000",
+			"upgradePackages": true
 		},
   },
-
-  // The default command of the base image is set to start the Jupyter server. If you do not use the Jupyter server, comment out "overrideCommand": false
-	"overrideCommand": false,
-
+  
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   "forwardPorts": [
     5000,
-    8888,
+    8888
   ],
   "portsAttributes": {
     "5000": {
@@ -49,30 +39,38 @@
     },
     "8888": {
       "label": "Jupyter",
-			"requireLocalPort": true,
-			"onAutoForward": "ignore"
+      "onAutoForward": "ignore",
+      "requireLocalPort": true
     },
   },
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "bash .devcontainer/data-science-jupyterlab/postCreate.sh",
+  "postCreateCommand": "bash .devcontainer/DataOps-Python/postCreate.sh",
 
   // Extensions for Visual Studio Code: https://marketplace.visualstudio.com/
   "customizations": {
     "vscode": {
       "extensions": [
+        // Documentation Extensions
+        "redhat.vscode-yaml",
+        "yzhang.markdown-all-in-one",
+        // Docker Supporting Extensions
+        "ms-azuretools.vscode-docker",
+        "ms-vscode-remote.remote-containers",
+        // Python Extensions
         "ms-python.python",
         "ms-python.vscode-pylance",
         "ms-toolsai.jupyter",
-        "ms-toolsai.jupyter-keymap",
         "ms-toolsai.jupyter-renderers",
+        // "ms-toolsai.jupyter-keymap",
+        // Github Actions
+        "github.vscode-github-actions",
       ],
       "settings": {
-        "python.defaultInterpreterPath": "/opt/conda/bin/python",
         "[python]": {
           "editor.defaultFormatter": "ms-python.black-formatter",
-					"editor.formatOnType": true,
-					"editor.formatOnSave": true
+          "editor.formatOnSave": true,
+          "editor.formatOnType": true,
         },
         "files.autoSave": "afterDelay",
         "files.autoSaveDelay": 1000,
@@ -83,22 +81,30 @@
             "jsdelivr.com"
           ]
         },
-        "sqltools.connections": [
-          {
-            "name": "Container Database",
-            "driver": "PostgreSQL",
-            "previewLimit": 50,
-            "server": "localhost",
-            "port": 5432,
-            "database": "idpdb",
-            "username": "idpuser",
-            "password": "idppassword"
-          }
-        ],
+        "[shellscript]": {
+          "editor.formatOnSave": true
+        },
+        // "sqltools.connections": [
+        //   {
+        //     "name": "Container Database",
+        //     "driver": "PostgreSQL",
+        //     "previewLimit": 50,
+        //     "server": "localhost",
+        //     "port": 5432,
+        //     "database": "idpdb",
+        //     "username": "idpuser",
+        //     "password": "idppassword"
+        //   }
+        // ],
+        "files.exclude": {
+					".ruff_cache": true,
+					".pytest_cache": true
+				}
       }
     }
   },
-
+  
   // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root
-  // "remoteUser": "root"
+  // "remoteUser": "root",
+  "remoteUser": "DataOps",
 }
