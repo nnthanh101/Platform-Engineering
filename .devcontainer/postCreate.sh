@@ -42,7 +42,8 @@ pip install --upgrade pip
 
 # echo "[x] Verify Java":              $(java -version)
 
-echo "[x] Verify K3s":               $(k3s -v)
+# echo "[x] Verify K3s":               $(k3s -v)
+echo "[x] Verify K3D":               $(k3d --version)
 # echo "[-] Verify minikube":          $(minikube version)
 # echo "[-] Verify eksctl":            $(eksctl version)
 echo "[x] Verify kubectl":           $(kubectl version --client)

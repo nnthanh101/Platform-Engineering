@@ -28,11 +28,11 @@ RUN wget "https://github.com/runatlantis/atlantis/releases/download/v0.28.3/atla
   && mv atlantis /usr/local/bin     \
   && rm -rf atlantis_linux_amd64.zip
 
-# RUN wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+RUN wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
 
-RUN curl -LO "https://github.com/k3s-io/k3s/releases/download/v1.30.2+k3s1/k3s" && \
-    mv k3s /usr/local/bin/k3s && \
-    chmod a+x /usr/local/bin/k3s
+# RUN curl -LO "https://github.com/k3s-io/k3s/releases/download/v1.30.2+k3s1/k3s" && \
+#     mv k3s /usr/local/bin/k3s && \
+#     chmod a+x /usr/local/bin/k3s
 
 RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
