@@ -33,12 +33,12 @@ echo "[x] Verify Python":            $(python -V)
 echo "[x] Verify Python3":           $(python3 -V)
 echo "[x] Verify Pip3":              $(pip3 -V)
 echo "[x] Verify Pip":               $(pip -V)
-echo "[x] Verify Jupyter Lab":       $(jupyter lab --version)
-echo "[x] Verify jupyter lab list:": $(jupyter lab list)
+# echo "[x] Verify Jupyter Lab":       $(jupyter lab --version)
+# echo "[x] Verify jupyter lab list:": $(jupyter lab list)
 # echo "[x] Verify pip freeze:"        $(pip freeze)
 
 pip install --upgrade pip
 # if [ -f requirements.txt* ]; then pip install --no-cache-dir -r requirements.txt; else pip install --upgrade jupyterlab ipykernel ipywidgets pandas numpy scipy statsmodels matplotlib seaborn plotly scikit-learn; fi
 # pip3 install --no-cache-dir -r .devcontainer/DataOps-Python/requirements.txt
 
-echo "To start JupyterLab: $ jupyter lab --ip=0.0.0.0 --allow-root"
+# echo "To start JupyterLab: $ jupyter lab --ip=0.0.0.0 --allow-root"

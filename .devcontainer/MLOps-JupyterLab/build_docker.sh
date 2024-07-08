@@ -3,7 +3,7 @@
 echo "Build the docker ..."
 
 ## Setting Parameters
-VENV_NAME="dataops"
+VENV_NAME="mlops"
 
 ## Identify the CPU type (M1 vs Intel)
 if [[ $(uname -m) ==  "aarch64" ]] ; then
@@ -15,13 +15,13 @@ else
 fi
 
 
-label="dataops"
+label="mlops"
 tag="$CPU"
 image_name="nnthanh101/$label:$tag"
 
-docker build . -f Dockerfile.DataOps    \
+docker build . -f Dockerfile.MLOps \
                --progress=plain \
-               --build-arg VENV_NAME="dataops" \
+               --build-arg VENV_NAME="mlops" \
                -t $image_name
 
 if [[ $? = 0 ]] ; then

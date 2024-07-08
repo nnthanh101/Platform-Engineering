@@ -1,4 +1,6 @@
 pandas
+requests
+python-dotenv
 numpy
 scipy
 statsmodels
@@ -7,19 +9,13 @@ boto3
 diagrams
 ipykernel
 ipywidgets
-jupyter
 jupyterlab-git
-requests
 matplotlib
 seaborn
-dash
 plotly
 vizro
 gunicorn
-python-dotenv
 prettytable
 ydata-profiling
 scikit-learn
-mlflow
 openai
-pyspark

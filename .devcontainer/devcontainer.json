@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/javascript-node-postgres
 {
-	"name": "Developer Experience (DevEx) Platform: Node.js & PostgreSQL",
+	"name": "DevEx (Developer Experience) Cloud Platform: NodeJS, Python, PostgreSQL, Terraform, CDK",
 	"dockerComposeFile": "docker-compose.yml",
 	"service": "devex",
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",

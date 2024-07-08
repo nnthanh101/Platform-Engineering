@@ -1,3 +1,6 @@
 pandas
 python-dotenv
-jupyterlab
+boto3
+requests
+openai
+pyspark

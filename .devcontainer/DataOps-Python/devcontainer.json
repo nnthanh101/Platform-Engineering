@@ -2,7 +2,7 @@
 // For DevContainer Templates, see https://containers.dev/templates
 // For config options,         see https://github.com/devcontainers/templates/tree/main/src/ubuntu
 {
-  "name": "DataOps: Python, JupyterLab, NodeJS",
+  "name": "DataOps: Python, NodeJS",
   // "image": "nnthanh101/dataops:arm64",
   "build": { 
     "dockerfile": "Dockerfile"
@@ -36,11 +36,6 @@
     "5000": {
       "label": "Application",
       "onAutoForward": "notify"
-    },
-    "8888": {
-      "label": "Jupyter",
-      "onAutoForward": "ignore",
-      "requireLocalPort": true
     },
   },
 

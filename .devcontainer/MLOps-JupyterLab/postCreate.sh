@@ -34,6 +34,9 @@ echo "[x] Verify Conda environment:" $(conda env list)
 
 pip install --upgrade pip
 # if [ -f requirements.txt* ]; then pip install --no-cache-dir -r requirements.txt; else pip install --upgrade jupyterlab ipykernel ipywidgets pandas numpy scipy statsmodels matplotlib seaborn plotly scikit-learn; fi
-pip3 install --no-cache-dir -r .devcontainer/data-science-jupyterlab/requirements.txt
+# pip3 install --no-cache-dir -r .devcontainer/MLOps-JupyterLab/requirements.txt
+# pip3 install --no-cache-dir mlflow
 
 echo "[x] Verify jupyter lab list":  $(jupyter lab list)
+
+# echo "[x] Verify MLFlow": $(mlflow --version)
