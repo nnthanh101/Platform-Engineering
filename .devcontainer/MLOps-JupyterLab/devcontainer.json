@@ -51,7 +51,7 @@
     "8888": {
       "label": "Jupyter",
 			"requireLocalPort": true,
-			"onAutoForward": "ignore"
+			"onAutoForward": "openBrowser"
     },
   },
 

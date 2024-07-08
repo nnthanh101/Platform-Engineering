@@ -1,6 +1,9 @@
-pandas
+jupyterlab
+jupyterlab-git
+ipykernel
+ipywidgets
 python-dotenv
-boto3
-requests
-openai
-pyspark
+pandas
+plotly
+vizro
+gunicorn

@@ -1,0 +1,23 @@
+ARG VARIANT="noble"
+FROM ubuntu:${VARIANT}
+
+LABEL maintainer="nnthanh101@gmail.com"
+LABEL version="1.0.1"
+ENV LANG=C.UTF-8
+ENV TZ=Pacific/Auckland
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+## Installing additional OS packages ...
+# && chromium build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev openjdk-11-jre-headless \
+# && apt-get -y install --no-install-recommends git jq make curl wget ca-certificates unzip imagemagick graphviz postgresql-client libsqlite3-dev \
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends graphviz \
+    && apt-get clean -y \
+    && rm -rf /var/lib/apt/lists/*
+
+## [Optional] Uncomment if you want to install an additional version of node using nvm
+# ARG EXTRA_NODE_VERSION=10
+# RUN su node -c "source /usr/local/share/nvm/nvm.sh && nvm install ${EXTRA_NODE_VERSION}"
+
+## [Optional] Uncomment if you want to install more global node modules
+# RUN su node -c "npm install -g <your-package-list-here>"

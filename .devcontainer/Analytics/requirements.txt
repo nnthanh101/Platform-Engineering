@@ -1,0 +1,10 @@
+pandas
+numpy
+python-dotenv
+ipykernel
+ipywidgets
+dash
+dash_extensions
+plotly
+vizro
+gunicorn

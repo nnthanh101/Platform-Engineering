@@ -5,7 +5,7 @@
   "name": "DataOps: Python, NodeJS",
   // "image": "nnthanh101/dataops:arm64",
   "build": { 
-    "dockerfile": "Dockerfile"
+    "dockerfile": "Dockerfile.DataOps"
   },
   // "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached", 
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
@@ -30,13 +30,18 @@
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   "forwardPorts": [
     5000,
-    8888
+    8888,
   ],
   "portsAttributes": {
     "5000": {
       "label": "Application",
       "onAutoForward": "notify"
     },
+    "8888": {
+        "label": "Jupyter",
+        "requireLocalPort": true,
+        "onAutoForward": "ignore"
+    }
   },
 
   // Use 'postCreateCommand' to run commands after the container is created.
