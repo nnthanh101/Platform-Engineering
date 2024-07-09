@@ -48,7 +48,7 @@ echo "[x] Verify K3D":               $(k3d --version)
 # echo "[-] Verify eksctl":            $(eksctl version)
 echo "[x] Verify kubectl":           $(kubectl version --client)
 echo "[x] Verify helm3":             $(helm version --short)
-curl -sS https://webinstall.dev/k9s | bash
+# curl -sS https://webinstall.dev/k9s | bash
 echo "[x] Verify k9s":               $(k9s version --short)
 
 echo "[x] Verify terraform":         $(terraform -v)
@@ -61,7 +61,7 @@ echo "[x] Verify sentinel":          $(sentinel -v)
 echo "[x] Verify atlantis":          $(atlantis version)
 echo "[x] Verify ngrok":             $(ngrok --version)
 
-echo "TODO: WIP ..."
+# echo "TODO: WIP ..."
 
 # git config --global --add safe.directory ${containerWorkspaceFolder}
 
@@ -70,7 +70,7 @@ echo "TODO: WIP ..."
 
 # echo "git lfs ..."
 # git lfs install
-# git lfs track "*.pptx"
+# git lfs track "*.csv"
 
 # echo "Installing Minikube ..."
 # cd k8s

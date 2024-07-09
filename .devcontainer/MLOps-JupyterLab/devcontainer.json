@@ -2,7 +2,7 @@
 // For DevContainer Templates, see https://containers.dev/templates
 // For config options,         see https://github.com/devcontainers/templates/tree/main/src/ubuntu
 {
-  "name": "MLOps: JupyterLab, Python, R, Tensorflow, PyTorch",
+  "name": "MLOps: Data-Science JupyterLab, Python, R, Julia, and Tensorflow/PyTorch",
   // "image": "quay.io/jupyter/${baseVariant}:${imageVariant}",
   "build": { 
     "dockerfile": "Dockerfile.MLOps",

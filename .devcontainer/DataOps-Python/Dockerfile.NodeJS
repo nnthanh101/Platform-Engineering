@@ -10,36 +10,40 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 ## Installing additional OS packages ...
 # && chromium build-essential libcairo2-dev libpango1.0-dev libjpeg-dev libgif-dev librsvg2-dev openjdk-11-jre-headless \
-# && apt-get -y install --no-install-recommends postgresql-client libsqlite3-dev \
+# && apt-get -y install --no-install-recommends curl wget ca-certificates unzip imagemagick graphviz postgresql-client libsqlite3-dev \
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get install -y --no-install-recommends curl ca-certificates wget unzip imagemagick graphviz \
+    && apt-get install -y --no-install-recommends graphviz \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
-## Installing more global node modules
-# RUN su node -c "npm install -g aws-cdk"
-## Install aws-cdk globally for the non-root user
-RUN npm install -g npm@latest aws-cdk --unsafe-perm
+## [Optional] Uncomment if you want to install an additional version of node using nvm
+# ARG EXTRA_NODE_VERSION=10
+# RUN su node -c "source /usr/local/share/nvm/nvm.sh && nvm install ${EXTRA_NODE_VERSION}"
 
-# RUN wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
+## [Optional] Uncomment if you want to install more global node modules
+# RUN su node -c "npm install -g <your-package-list-here>"
+
+RUN wget "https://github.com/runatlantis/atlantis/releases/download/v0.28.3/atlantis_linux_amd64.zip" \
+  && unzip atlantis_linux_amd64.zip \
+  && mv atlantis /usr/local/bin     \
+  && rm -rf atlantis_linux_amd64.zip
+
+RUN wget -q -O - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash
 
 # RUN curl -LO "https://github.com/k3s-io/k3s/releases/download/v1.30.2+k3s1/k3s" && \
 #     mv k3s /usr/local/bin/k3s && \
 #     chmod a+x /usr/local/bin/k3s
 
-## Installing Helm, Kubectl, Atlantis, Ngrok
 RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
 RUN curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl" && \
     mv kubectl /usr/local/bin && \
     chmod 0755 /usr/local/bin/kubectl
 
-RUN wget "https://github.com/runatlantis/atlantis/releases/download/v0.28.3/atlantis_linux_amd64.zip" \
-    && unzip atlantis_linux_amd64.zip \
-    && mv atlantis /usr/local/bin     \
-    && rm -rf atlantis_linux_amd64.zip
-
 RUN wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.zip \
   && unzip ngrok-v3-stable-linux-amd64.zip \
   && mv ngrok /usr/local/bin \
   && rm ngrok-v3-stable-linux-amd64.zip
+
+## Install aws-cdk globally for the non-root user
+RUN npm install -g npm@latest aws-cdk --unsafe-perm

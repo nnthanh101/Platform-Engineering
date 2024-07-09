@@ -9,10 +9,19 @@
 - Makes it easier for new developers to start contributing to the project
 - No extra setup required
 
-## Known Issues
 
-- Performance is a known issue. Working inside devcontainers require developers to have a powerful computer. See [System Requirements](https://code.visualstudio.com/docs/devcontainers/containers#_system-requirements)
 
-## Usage
+Simplified DevEx in bare-metal:
 
-Just copy the `.devcontainer`` folder to the root of the directory, and VSCode will automatically detect the configuration and suggest that you re-open the repository using **DevContainer**.
+- 3x Clusters (Dev,QA,Pre-Prod)
+
+- Stack:
+
+- Kubernetes (vanilla kubeadm installation) LB (Haproxy) + 3x control-planes + N workers
+
+- ArgoCD + Ingress + Monitoring/Logging stack (Grafana, Prometheus, Opensearch)
+
+- Github, Bitbucket or similar.
+
+Basically, you promote your app from Dev -> Prod deploying you code in Github and ArgoCD sync does the rest.
+
