@@ -1,0 +1,106 @@
+// For DevContainer Format,    see https://aka.ms/devcontainer.json
+// For DevContainer Templates, see https://containers.dev/templates
+// For config options,         see https://github.com/devcontainers/templates/tree/main/src/ubuntu
+{
+  "name": "MLOps: Data-Science JupyterLab, Python, R, Julia, and Tensorflow/PyTorch",
+  // "image": "quay.io/jupyter/${baseVariant}:${imageVariant}",
+  "build": { 
+    "dockerfile": "Dockerfile.MLOps",
+    // "args": { "accept_license": "Y" }
+  },
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached", 
+  "workspaceFolder": "/workspace",
+
+  // Features to add to the DevContainer, see https://containers.dev/features
+  "features": {
+    "ghcr.io/devcontainers/features/node:1.5.0": {
+      "nodeGypDependencies": true,
+      "version": "20",
+      "nvmVersion": "latest"
+    },
+    // "ghcr.io/devcontainers/features/python:1.6.2": {
+    //   "installTools": true,
+    //   "optimize": true,
+    //   "installJupyterlab": true,
+    //   "version": "3.12"
+    // },
+    "ghcr.io/devcontainers/features/common-utils:2.4.3": {
+			"installZsh": "true",
+      "installOhMyZsh": "true",
+			"username": "jovyan",
+			"userUid": "1001",
+			"userGid": "1001",
+			"upgradePackages": "true"
+		},
+  },
+
+  // The default command of the base image is set to start the Jupyter server. If you do not use the Jupyter server, comment out "overrideCommand": false
+	"overrideCommand": false,
+
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  "forwardPorts": [
+    // 5000,
+    8888,
+  ],
+  "portsAttributes": {
+    // "5000": {
+    //   "label": "MLFlow UI",
+    //   "requireLocalPort": true,
+		// 	"onAutoForward": "ignore"
+    // },
+    "8888": {
+      "label": "Jupyter",
+			"requireLocalPort": true,
+			"onAutoForward": "openBrowser"
+    },
+  },
+
+  // Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": "bash .devcontainer/MLOps-JupyterLab/postCreate.sh",
+
+  // Extensions for Visual Studio Code: https://marketplace.visualstudio.com/
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter",
+        "ms-toolsai.jupyter-keymap",
+        "ms-toolsai.jupyter-renderers",
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/opt/conda/bin/python",
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.black-formatter",
+					"editor.formatOnType": true,
+					"editor.formatOnSave": true
+        },
+        "files.autoSave": "afterDelay",
+        "files.autoSaveDelay": 1000,
+        "[jupyter]": {
+          "themeMatplotlibPlots": true,
+          "widgetScriptSources": [
+            "unpkg.com",
+            "jsdelivr.com"
+          ]
+        },
+        "sqltools.connections": [
+          {
+            "name": "Container Database",
+            "driver": "PostgreSQL",
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "database": "idpdb",
+            "username": "idpuser",
+            "password": "idppassword"
+          }
+        ],
+      }
+    }
+  },
+
+  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root
+  // "remoteUser": "root"
+  "remoteUser": "jovyan"
+}

@@ -1,0 +1,124 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/javascript-node-postgres
+{
+	"name": "Analytics: Python | JupyterLab, Pandas | Scikit-learn | Vizro",
+	"build": { 
+    "dockerfile": "Dockerfile.Analytics"
+  },
+  // "dockerComposeFile": "docker-compose.yml",
+	// "service": "analytics",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	"features": {
+		"ghcr.io/devcontainers/features/python:1.6.2": {
+      "installTools": true,
+      "optimize": true,
+      "installJupyterlab": true,
+			// "configureJupyterlabAllowOrigin": "",
+      "version": "3.12"
+    },
+    "ghcr.io/devcontainers/features/node:1.5.0": {
+      "nodeGypDependencies": true,
+      "version": "20",
+      "nvmVersion": "latest"
+    },
+		"ghcr.io/devcontainers/features/common-utils:2.4.4": {
+      "installZsh": true,
+      "installOhMyZsh": true,
+      "username": "analytics",
+      "userUid": "1001",
+      "userGid": "1001",
+      "upgradePackages": true
+    },
+	},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// This can be used to network with other containers or with the host.
+	"forwardPorts": [
+    5000,
+    8888,
+  ],
+  "portsAttributes": {
+    "5000": {
+      "label": "Application",
+      "onAutoForward": "notify"
+    },
+    "8888": {
+      "label": "Jupyter",
+      "onAutoForward": "ignore",
+      "requireLocalPort": true
+    },
+  },
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+  "postCreateCommand": "bash .devcontainer/Analytics/postCreate.sh",
+
+	// Configure tool-specific properties.
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // Documentation Extensions
+        "redhat.vscode-yaml",
+        "yzhang.markdown-all-in-one",
+        // Docker Supporting Extensions
+        "ms-azuretools.vscode-docker",
+        "ms-vscode-remote.remote-containers",
+        // Python Extensions
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter",
+        "ms-toolsai.jupyter-renderers",
+        // "ms-toolsai.jupyter-keymap",
+        // Github Actions
+        "github.vscode-github-actions",
+        // SQL, CSV, ngrok
+        // "mtxr.sqltools",
+				// "mtxr.sqltools-driver-pg",
+				"mechatroner.rainbow-csv",
+        "philnash.ngrok-for-vscode",
+      ],
+      "settings": {
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.black-formatter",
+          "editor.formatOnSave": true,
+          // "editor.formatOnType": true,
+        },
+        "editor.formatOnSave": true,
+        "editor.formatOnSaveTimeout": 5000,
+        // "files.autoSave": "afterDelay",
+        // "files.autoSaveDelay": 1000,
+        // "[jupyter]": {
+        //   "themeMatplotlibPlots": true,
+        //   "widgetScriptSources": [
+        //     "unpkg.com",
+        //     "jsdelivr.com"
+        //   ]
+        // },
+        // "[shellscript]": {
+        //   "editor.formatOnSave": true
+        // },
+        // "sqltools.connections": [
+        //   {
+        //     "name": "Container Database",
+        //     "driver": "PostgreSQL",
+        //     "previewLimit": 50,
+        //     "server": "localhost",
+        //     "port": 5432,
+        //     "database": "idpdb",
+        //     "username": "idpuser",
+        //     "password": "idppassword"
+        //   }
+        // ],
+        "files.exclude": {
+					".ruff_cache": true,
+					".pytest_cache": true
+				}
+      }
+    }
+  },
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+  "remoteUser": "analytics"
+}

@@ -1,0 +1,9 @@
+jupyterlab
+jupyterlab-git
+ipykernel
+ipywidgets
+python-dotenv
+pandas
+plotly
+vizro
+gunicorn

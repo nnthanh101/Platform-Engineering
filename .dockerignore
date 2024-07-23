@@ -1,0 +1,11 @@
+**/.env
+**/.aws
+**/.ssh
+.git
+
+node_modules
+dist-types
+packages/*/dist
+packages/*/node_modules
+plugins/*/dist
+plugins/*/node_modules
