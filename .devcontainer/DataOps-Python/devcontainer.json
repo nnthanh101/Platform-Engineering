@@ -17,7 +17,7 @@
       "version": "20",
       "nvmVersion": "latest"
     },
-    "ghcr.io/devcontainers/features/common-utils:2.4.3": {
+    "ghcr.io/devcontainers/features/common-utils:2.4.4": {
 			"installZsh": true,
       "installOhMyZsh": true,
 			"username": "DataOps",
