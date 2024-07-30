@@ -1,5 +1,9 @@
 # Platform Engineering
 
+## 0.2.0
+
+* https://pnpm.io/installation
+
 ## 0.1.0
 
 ### 1st-Init

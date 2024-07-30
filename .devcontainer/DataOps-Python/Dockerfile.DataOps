@@ -20,6 +20,10 @@ COPY requirements.txt /requirements/
 ## Run installation script to setup the virtual environment
 RUN bash /requirements/install_requirements.sh $VENV_NAME
 
+## Install dependencies
+# COPY .devcontainer/requirements.txt .
+# RUN pip install --no-cache-dir -r requirements.txt && rm requirements.txt
+
 
 ### Final Stage: Copy the Python virtual environment from Builder Image
 FROM python:3.12-slim AS final

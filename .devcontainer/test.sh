@@ -108,3 +108,7 @@ echo "[x] Verify ngrok":             $(ngrok --version)
 # tar -xvf /tmp/$KF_TAR_FILENAME -C /tmp/
 # sudo mv /tmp/XXX /usr/local/bin/XXX
 # sudo chmod +x /usr/local/bin/XXX
+
+## K3d
+# k3d cluster list
+# kubectl config get-contexts
