@@ -11,7 +11,7 @@
 
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	"features": {
-		"ghcr.io/devcontainers/features/python:1.6.2": {
+		"ghcr.io/devcontainers/features/python:1.6.3": {
       "installTools": true,
       "optimize": true,
       "installJupyterlab": true,
