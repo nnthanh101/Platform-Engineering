@@ -49,7 +49,7 @@
 		// "ghcr.io/devcontainers-contrib/features/aws-cdk:2": {
 		// 	"version": "latest"
 		// },
-		"ghcr.io/devcontainers/features/common-utils:2.4.4": {
+		"ghcr.io/devcontainers/features/common-utils:2.4.5": {
       "installZsh": true,
       "installOhMyZsh": true,
       "username": "devex",
